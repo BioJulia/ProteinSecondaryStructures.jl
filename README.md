@@ -2,6 +2,16 @@
 
 This package parses the [Stride](https://en.wikipedia.org/wiki/STRIDE_(algorithm)) secondary structure prediction output, to make it convenient to use from Julia, and for the analysis of MD simulations. 
 
+1. [Installation](#installation)
+2. [Usage](#usage)
+
+   - [Computing from a PDB file](#computing-the-secondary-structure-from-a-pdb-file)
+   - [Computing from a PDBTools selection](#computing-from-a-selection-of-atoms-using-pdbtools)
+   - [Interpretation of the output](#interpretation-of-the-output)
+   - [Computing the secondary structure in a MD trajectory](#computing-the-secondary-structure-in-a-trajectory)
+
+3. [References](#references)
+
 ## Installation
 
 Obtain `stride` from the corresponding repository, compile it and add it to your path:
@@ -36,7 +46,7 @@ julia> ss = secondary_structure(pdbfile)
  StrideData("ASN", "B", 255, 255, "C", -130.75, 360.0, 114.8)
 ```
 
-### Computing from a selection of atoms, using PDBTools
+### Computing from a selection of atoms using PDBTools
 
 Install `PDBTools` with:
 ```julia
@@ -66,7 +76,7 @@ julia> ss = secondary_structure(pdb)
  StrideData("ASN", "A", 255, 255, "C", -130.97, 360.0, 100.9)
 ```
 
-## Interpreting the output 
+## Interpretation of the output
 
 The output is a vector of `StrideData` elements, with the following data, for each residue:
 
