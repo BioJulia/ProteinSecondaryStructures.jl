@@ -152,7 +152,7 @@ See the [DSSP secondary structure classification](https://en.wikipedia.org/wiki/
 
 ### Computing the secondary structure in a trajectory 
 
-```
+```julia
 using Stride
 import PDBTools
 import Chemfiles
