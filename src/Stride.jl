@@ -1,5 +1,6 @@
 module Stride
 
+import Chemfiles
 import PDBTools
 
 export StrideData
@@ -77,21 +78,59 @@ const classes = Dict{String,String}(
     "S" => "bend",
     "C" => "coil",
 )
+
+"""
+    class(ss::StrideData)
+
+Return the secondary structure class of the data. The classes are:
+
+* `"3₁₀ helix"`
+* `"α helix"`
+* `"π helix"`
+* `"turn"`
+* `"β strand"`
+* `"β bridge"`
+* `"bend"`
+* `"coil"`
+
+"""
 class(ss::StrideData) = classes[ss.sstype]
 
-is_helix(ss::StrideData) = ss.sstype in ("H", "G", "I")
-is_alphahelix(ss::StrideData) = ss.sstype == "H"
-is_pihelix(ss::StrideData) = ss.sstype == "I"
-is_310helix(ss::StrideData) = ss.sstype == "G"
+@doc """
+    is_helix(ss::StrideData)
+    is_alphahelix(ss::StrideData)
+    is_pihelix(ss::StrideData)
+    is_310helix(ss::StrideData)
+    is_strand(ss::StrideData)
+    is_betastrand(ss::StrideData)
+    is_betabridge(ss::StrideData)
+    is_turn(ss::StrideData)
+    is_bend(ss::StrideData)
+    is_coil(ss::StrideData)
 
-is_strand(ss::StrideData) = ss.sstype in ("E", "B")
-is_betastrand(ss::StrideData) = ss.sstype == "E"
-is_betabridge(ss::StrideData) = ss.sstype == "B"
+Return `true` if the data is of the given secondary structure type.
 
-is_turn(ss::StrideData) = ss.sstype == "T"
-is_bend(ss::StrideData) = ss.sstype == "S"
-is_coil(ss::StrideData) = ss.sstype == "C"
+"""
+function is_function end
 
+@doc (@doc is_function) is_helix(ss::StrideData) = ss.sstype in ("H", "G", "I")
+@doc (@doc is_function) is_alphahelix(ss::StrideData) = ss.sstype == "H"
+@doc (@doc is_function) is_pihelix(ss::StrideData) = ss.sstype == "I"
+@doc (@doc is_function) is_310helix(ss::StrideData) = ss.sstype == "G"
+@doc (@doc is_function) is_strand(ss::StrideData) = ss.sstype in ("E", "B")
+@doc (@doc is_function) is_betastrand(ss::StrideData) = ss.sstype == "E"
+@doc (@doc is_function) is_betabridge(ss::StrideData) = ss.sstype == "B"
+@doc (@doc is_function) is_turn(ss::StrideData) = ss.sstype == "T"
+@doc (@doc is_function) is_bend(ss::StrideData) = ss.sstype == "S"
+@doc (@doc is_function) is_coil(ss::StrideData) = ss.sstype == "C"
+
+"""
+    ss_composition(data::AbstractVector{<:StrideData})
+
+Calculate the secondary structure composition of the data. Returns a dictionary of
+the secondary structure types and their counts.
+
+"""
 function ss_composition(data::AbstractVector{<:StrideData})
     helix = count(is_helix, data)
     alpha_helix = count(is_alphahelix, data)
@@ -117,4 +156,42 @@ function ss_composition(data::AbstractVector{<:StrideData})
     )
 end
 
+"""
+    ss_content(f::F, atoms::AbstractVector{<:PDBTools.Atom}, trajectory::Chemfiles.Trajectory)
+
+Calculate the secondary structure content of the trajectory. `f` is the function that returns,
+for each residue, if the secondary structure is of a certain type. For example, to calculate 
+the alpha helix content, use `f = is_alphahelix`.
+
+"""
+function ss_content(
+    f::F, 
+    atoms::AbstractVector{<:PDBTools.Atom}, 
+    trajectory::Chemfiles.Trajectory, 
+) where {F<:Function}
+    atom_indices = [atom.index for atom in atoms]
+    ss_content = Float64[]
+    for frame in trajectory
+        coordinates = Chemfiles.positions(frame)
+        for (i,col) in enumerate(eachcol(coordinates))
+            if i in atom_indices
+               x, y, z = col[1], col[2], col[3]
+               atoms[i].x = x
+               atoms[i].y = y
+               atoms[i].z = z
+            end
+        end
+        tmp_file = tempname()
+        PDBTools.writePDB(atoms, tmp_file)
+        ss = secondary_structure(tmp_file)
+        rm(tmp_file) 
+        push!(ss_content, count(f, ss) / length(ss))
+    end
+    return ss_content
+end
+
+# Testing module
+include("../test/Testing.jl")
+
 end # module Stride
+
