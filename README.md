@@ -1,7 +1,6 @@
-# Stride
+# Stride.jl
 
-This package parses the Stride secondary structure prediction output, to make it convenient to use from Julia, 
-and for the analysis of MD simulations. 
+This package parses the [Stride](https://en.wikipedia.org/wiki/STRIDE_(algorithm)) secondary structure prediction output, to make it convenient to use from Julia, and for the analysis of MD simulations. 
 
 ## Installation
 
