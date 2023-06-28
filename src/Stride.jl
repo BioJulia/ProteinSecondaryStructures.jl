@@ -265,6 +265,12 @@ end
     @test sum(helical_content)/length(helical_content) ≈ 0.2181174089068826
 end
 
+"""
+    ss_map(atoms::AbstractVector{<:PDBTools.Atom}, trajectory::Chemfiles.Trajectory)
+
+Calculate the secondary structure map of the trajectory. Returns a matrix of the secondary.
+
+"""
 function ss_map(
     atoms::AbstractVector{<:PDBTools.Atom},
     trajectory::Chemfiles.Trajectory,
