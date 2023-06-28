@@ -31,10 +31,10 @@ julia> pdbfile = "pdb1fmc.pdb"
 
 julia> ss = secondary_structure(pdbfile)
 510-element Vector{Stride.StrideData}:
- Stride.StrideData("MET", "A", 1, 1, "C", 360.0, 150.62, 234.4)
- Stride.StrideData("PHE", "A", 2, 2, "C", -69.01, 138.78, 162.9)
- ⋮
- Stride.StrideData("ASN", "B", 255, 255, "C", -130.75, 360.0, 114.8)
+ StrideData("MET", "A", 1, 1, "C", 360.0, 150.62, 234.4)
+ StrideData("PHE", "A", 2, 2, "C", -69.01, 138.78, 162.9)
+ 
+ StrideData("ASN", "B", 255, 255, "C", -130.75, 360.0, 114.8)
 ```
 
 ### Computing from a selection of atoms, using PDBTools
