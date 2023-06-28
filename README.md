@@ -134,6 +134,23 @@ julia> is_helix.(ss)
 
 where in the last example we used the broadcast operation (the dot) to obtain the result of the application of the function for the complete array of residues.
 
+The following functions are available:
+```julia
+is_helix
+is_alphahelix
+is_pihelix
+is_310helix
+
+is_strand
+is_betastrand
+is_betabridge
+is_turn
+is_bend
+is_coil
+```
+
+See the [DSSP secondary structure classification](https://en.wikipedia.org/wiki/Protein_secondary_structure) for further information.
+
 ## Note
 
 This is a package under early development. New functionality and breaking changes may occur. 
