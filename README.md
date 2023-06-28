@@ -9,6 +9,7 @@ This package parses the [Stride](https://en.wikipedia.org/wiki/STRIDE_(algorithm
    - [Computing from a PDBTools selection](#computing-from-a-selection-of-atoms-using-pdbtools)
    - [Interpretation of the output](#interpretation-of-the-output)
    - [Computing the secondary structure in a MD trajectory](#computing-the-secondary-structure-in-a-trajectory)
+   - [Computing the secondary structure map along the trajectory](#computing-secondary-structure-map)
 
 3. [References](#references)
 
@@ -171,6 +172,44 @@ atoms = PDBTools.readPDB("system.pdb", "protein and chain A")
 trajectory = Chemfiles.Trajectory("./trajectory.xtc")
 
 helical_content = ss_content(is_helix, atoms, trajectory)
+```
+
+### Computing the secondary structure map
+
+```julia
+using Stride
+import PDBTools
+import Chemfiles
+
+atoms = PDBTools.readPDB("system.pdb", "protein and chain A")
+trajectory = Chemfiles.Trajectory("./trajectory.xtc")
+
+ssmap = ss_map(atoms, trajectory) # returns a matrix
+```
+
+This will create a matrix that can be visualized, for instance, with:
+
+```julia
+using Plots
+heatmap(ssmap,xlabel="step",ylabel="residue")
+```
+
+producing the figure:
+
+![heatmap](./test/map.png)
+
+where the colors refer to the following scale:
+```julia
+const ss_code = Dict{String,Int}(
+    "G" => 1,
+    "H" => 2,
+    "I" => 3,
+    "T" => 4,
+    "E" => 5,
+    "B" => 6,
+    "S" => 7,
+    "C" => 8,
+)
 ```
 
 ## Note
