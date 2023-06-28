@@ -150,6 +150,19 @@ is_coil
 
 See the [DSSP secondary structure classification](https://en.wikipedia.org/wiki/Protein_secondary_structure) for further information.
 
+### Computing the secondary structure in a trajectory 
+
+```
+using Stride
+import PDBTools
+import Chemfiles
+
+atoms = PDBTools.readPDB("system.pdb", "protein and chain A")
+trajectory = Chemfiles.Trajectory("./trajectory.xtc")
+
+helical_content = ss_content(is_helix, atoms, trajectory)
+```
+
 ## Note
 
 This is a package under early development. New functionality and breaking changes may occur. 
