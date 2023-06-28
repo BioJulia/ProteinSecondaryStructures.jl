@@ -1,5 +1,7 @@
 module Stride
 
+using TestItems
+
 import Chemfiles
 import PDBTools
 
@@ -11,6 +13,7 @@ export is_bend, is_coil, is_turn
 export class
 export ss_composition
 export ss_content
+export ss_map
 
 # Assume "stride" is in the path
 executable = "stride"
@@ -63,10 +66,50 @@ function secondary_structure(pdb_file::String)
     return ssvector
 end
 
+@testitem "from pdb file" begin
+    using Stride.Testing
+    pdbfile = joinpath(Testing.data_dir,"pdb","pdb1fmc.pdb")
+    ss = secondary_structure(pdbfile)
+    @test length(ss) == 510
+    @test ss_composition(ss) == Dict{String, Int}(
+        "3₁₀ helix" => 21, 
+        "bend" => 0, 
+        "turn" => 70, 
+        "helix" => 263, 
+        "beta strand" => 77, 
+        "alpha helix" => 242, 
+        "pi helix" => 0, 
+        "beta bridge" => 4, 
+        "strand" => 81, 
+        "coil" => 96
+    )
+end
+
 function secondary_structure(atoms::AbstractVector{<:PDBTools.Atom})
     tmp_file = tempname()
     PDBTools.writePDB(atoms, tmp_file)
     return secondary_structure(tmp_file)
+end
+
+@testitem "from Vector{<:PDBTools.Atom}" begin
+    using Stride.Testing
+    using PDBTools
+    pdbfile = joinpath(Testing.data_dir,"pdb","pdb1fmc.pdb")
+    atoms = readPDB(pdbfile, "protein and chain A")
+    ss = secondary_structure(atoms)
+    @test length(ss) == 255 
+    @test ss_composition(ss) == Dict{String, Int}(
+        "3₁₀ helix"   => 11,
+        "bend"        => 0,
+        "turn"        => 34,
+        "helix"       => 132,
+        "beta strand" => 39,
+        "alpha helix" => 121,
+        "pi helix"    => 0,
+        "beta bridge" => 2,
+        "strand"      => 41,
+        "coil"        => 48,
+    )
 end
 
 const classes = Dict{String,String}(
@@ -78,6 +121,17 @@ const classes = Dict{String,String}(
     "B" => "β bridge",
     "S" => "bend",
     "C" => "coil",
+)
+
+const ss_code = Dict{String,Int}(
+    "G" => 1,
+    "H" => 2,
+    "I" => 3,
+    "T" => 4,
+    "E" => 5,
+    "B" => 6,
+    "S" => 7,
+    "C" => 8,
 )
 
 """
@@ -157,6 +211,27 @@ function ss_composition(data::AbstractVector{<:StrideData})
     )
 end
 
+function ss_frame!(
+    atoms::AbstractVector{<:PDBTools.Atom},
+    atom_indices::Vector{Int},
+    frame::Chemfiles.Frame,
+)
+   coordinates = Chemfiles.positions(frame)
+   for (i,col) in enumerate(eachcol(coordinates))
+       if i in atom_indices
+          x, y, z = col[1], col[2], col[3]
+          atoms[i].x = x
+          atoms[i].y = y
+          atoms[i].z = z
+       end
+   end
+   tmp_file = tempname()
+   PDBTools.writePDB(atoms, tmp_file)
+   ss = secondary_structure(tmp_file)
+   rm(tmp_file) 
+   return ss
+end
+
 """
     ss_content(f::F, atoms::AbstractVector{<:PDBTools.Atom}, trajectory::Chemfiles.Trajectory)
 
@@ -171,24 +246,49 @@ function ss_content(
     trajectory::Chemfiles.Trajectory, 
 ) where {F<:Function}
     atom_indices = [atom.index for atom in atoms]
-    ss_content = Float64[]
-    for frame in trajectory
-        coordinates = Chemfiles.positions(frame)
-        for (i,col) in enumerate(eachcol(coordinates))
-            if i in atom_indices
-               x, y, z = col[1], col[2], col[3]
-               atoms[i].x = x
-               atoms[i].y = y
-               atoms[i].z = z
-            end
-        end
-        tmp_file = tempname()
-        PDBTools.writePDB(atoms, tmp_file)
-        ss = secondary_structure(tmp_file)
-        rm(tmp_file) 
-        push!(ss_content, count(f, ss) / length(ss))
+    ss_content = zeros(Float64, length(trajectory))
+    for (iframe,frame) in enumerate(trajectory)
+        ss = ss_frame!(atoms, atom_indices, frame)
+        ss_content[iframe] = count(f, ss) / length(ss)
     end
     return ss_content
+end
+
+@testitem "ss_content" begin
+    using Stride.Testing
+    using PDBTools
+    using Chemfiles
+    pdbfile = joinpath(Testing.data_dir,"Gromacs","system.pdb")
+    trajectory = Trajectory(joinpath(Testing.data_dir,"Gromacs","trajectory.xtc"))
+    helical_content = ss_content(is_helix, readPDB(pdbfile, "protein"), trajectory)
+    @test length(helical_content) == 26
+    @test sum(helical_content)/length(helical_content) ≈ 0.2181174089068826
+end
+
+function ss_map(
+    atoms::AbstractVector{<:PDBTools.Atom},
+    trajectory::Chemfiles.Trajectory,
+)
+    atom_indices = [atom.index for atom in atoms]
+    ss_map = zeros(Int,length(PDBTools.eachresidue(atoms)), length(trajectory))
+    for (iframe, frame) in enumerate(trajectory)
+        ss = ss_frame!(atoms, atom_indices, frame)
+        for (i, ssdata) in pairs(ss)
+            ss_map[i,iframe] = ss_code[ssdata.sstype]
+        end
+    end
+    return ss_map
+end
+
+@testitem "ss_map" begin
+    using Stride.Testing
+    using PDBTools
+    using Chemfiles
+    pdbfile = joinpath(Testing.data_dir,"Gromacs","system.pdb")
+    trajectory = Trajectory(joinpath(Testing.data_dir,"Gromacs","trajectory.xtc"))
+    ssmap = ss_map(readPDB(pdbfile, "protein"), trajectory)
+    @test size(ssmap) == (76, 26)
+    @test sum(ssmap) == 9032
 end
 
 # Testing module
