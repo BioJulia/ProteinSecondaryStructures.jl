@@ -134,6 +134,10 @@ julia> is_helix.(ss)
 
 where in the last example we used the broadcast operation (the dot) to obtain the result of the application of the function for the complete array of residues.
 
+## Note
+
+This is a package under early development. New functionality and breaking changes may occur. 
+
 ## References
 
 This package is wrapper for the `stride` algorithm for secondary structure prediction. If this was useful, please cite:
