@@ -3,8 +3,12 @@ uuid = "c298f58b-271f-48cb-96ac-5442ca7c67d9"
 authors = ["Leandro Martinez <lmartine@unicamp.br> and contributors"]
 version = "1.0.0-DEV"
 
+[deps]
+PDBTools = "e29189f1-7114-4dbd-93d0-c5673a921a58"
+
 [compat]
-julia = "1"
+julia = "1.6"
+PDBTools = "0.13"
 
 [extras]
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
