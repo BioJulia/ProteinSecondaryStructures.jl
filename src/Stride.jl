@@ -10,6 +10,7 @@ export is_strand, is_betastrand, is_betabridge
 export is_bend, is_coil, is_turn
 export class
 export ss_composition
+export ss_content
 
 # Assume "stride" is in the path
 executable = "stride"
