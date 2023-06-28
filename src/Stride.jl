@@ -13,6 +13,7 @@ export ss_composition
 # Assume "stride" is in the path
 executable = "stride"
 
+import Base: @kwdef # for 1.6 compatibility
 @kwdef struct StrideData
     resname::String
     chain::String
