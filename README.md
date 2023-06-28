@@ -9,7 +9,8 @@ This package parses the [Stride](https://en.wikipedia.org/wiki/STRIDE_(algorithm
    - [Computing from a PDBTools selection](#computing-from-a-selection-of-atoms-using-pdbtools)
    - [Interpretation of the output](#interpretation-of-the-output)
    - [Computing the secondary structure in a MD trajectory](#computing-the-secondary-structure-in-a-trajectory)
-   - [Computing the secondary structure map along the trajectory](#computing-secondary-structure-map)
+   - [Computing the secondary structure map along the trajectory](#computing-the-secondary-structure-map)
+
 
 3. [References](#references)
 
