@@ -99,7 +99,7 @@ end
 
 The classes of secondary structure and their codes are:
 
-| Secondary structure | `sstype`     | `ss_code`    |
+| Secondary structure | `sstype`     | `sscode`    |
 |---------------------|:------------:|:------------:|
 | `"310 helix"`       | `"G"`        | `1`          | 
 | `"alpha helix"`     | `"H"`        | `2`          |
