@@ -16,7 +16,7 @@ export ss_content
 export ss_map
 
 # Assume "stride" is in the path
-executable = "stride"
+stride_exec = "stride"
 
 import Base: @kwdef # for 1.6 compatibility
 @kwdef struct StrideData
@@ -37,14 +37,15 @@ end
 Run stride on the pdb file and return a vector containing the `stride` detailed
 secondary structure information for each residue.
 
-The `stride` executable must be in the path.
+The `stride` executable must be in the path or, alternatively, the `Stride.stride_exec`
+variable can be set to the full path of the executable.
 
 """
 function secondary_structure end
 
 function secondary_structure(pdb_file::String)
     # Run stride on the pdb file
-    stride_raw_data = readchomp(pipeline(`$executable $pdb_file`))
+    stride_raw_data = readchomp(pipeline(`$stride_exec $pdb_file`))
     ssvector = StrideData[]
     for line in split(stride_raw_data, "\n")
         if startswith(line, "ASG")
@@ -88,7 +89,9 @@ end
 function secondary_structure(atoms::AbstractVector{<:PDBTools.Atom})
     tmp_file = tempname()
     PDBTools.writePDB(atoms, tmp_file)
-    return secondary_structure(tmp_file)
+    ss = secondary_structure(tmp_file)
+    rm(tmp_file)
+    return ss
 end
 
 @testitem "from Vector{<:PDBTools.Atom}" begin
@@ -99,7 +102,7 @@ end
     ss = secondary_structure(atoms)
     @test length(ss) == 255 
     @test ss_composition(ss) == Dict{String, Int}(
-        "3₁₀ helix"   => 11,
+        "310 helix"   => 11,
         "bend"        => 0,
         "turn"        => 34,
         "helix"       => 132,
@@ -113,43 +116,64 @@ end
 end
 
 const classes = Dict{String,String}(
-    "G" => "3₁₀ helix",
-    "H" => "α helix",
-    "I" => "π helix",
+    "G" => "310 helix",
+    "H" => "alpha helix",
+    "I" => "pi helix",
     "T" => "turn",
-    "E" => "β strand",
-    "B" => "β bridge",
+    "E" => "beta strand",
+    "B" => "beta bridge",
     "S" => "bend",
     "C" => "coil",
 )
 
-const ss_code = Dict{String,Int}(
-    "G" => 1,
-    "H" => 2,
-    "I" => 3,
-    "T" => 4,
-    "E" => 5,
-    "B" => 6,
-    "S" => 7,
-    "C" => 8,
+const sscode = Dict{String,Int}(
+    "G" => 1, # 310 helix
+    "H" => 2, # alpha helix
+    "I" => 3, # pi helix
+    "T" => 4, # turn
+    "E" => 5, # beta strand
+    "B" => 6, # beta bridge
+    "S" => 7, # bend
+    "C" => 8, # coil
+)
+
+const code_to_ss = Dict{Int,String}(
+   1 => "G", # 310 helix
+   2 => "H", # alpha helix
+   3 => "I", # pi helix
+   4 => "T", # turn
+   5 => "E", # beta strand
+   6 => "B", # beta bridge
+   7 => "S", # bend
+   8 => "C", # coil
 )
 
 """
     class(ss::StrideData)
+    class(sscode::Int)
+    class(sstype::String)
 
-Return the secondary structure class of the data. The classes are:
+Return the secondary structure class. The input may be a `StrideData` object, 
+a secondary structure `Int` code (1-8) or a secondary structure type string (`G, H, ..., C`).
 
-* `"3₁₀ helix"`
-* `"α helix"`
-* `"π helix"`
-* `"turn"`
-* `"β strand"`
-* `"β bridge"`
-* `"bend"`
-* `"coil"`
+The secondary structure classes are:
+
+| Secondary structure | `sstype`     | `sscode`    |
+|:--------------------|:------------:|:------------:|
+| `"310 helix"`       | `"G"`        | `1`          | 
+| `"alpha helix"`     | `"H"`        | `2`          |
+| `"pi helix"`        | `"I"`        | `3`          |
+| `"turn"`            | `"T"`        | `4`          |
+| `"beta strand"`     | `"E"`        | `5`          |
+| `"beta bridge"`     | `"B"`        | `6`          |
+| `"bend"`            | `"S"`        | `7`          |
+| `"coil"`            | `"C"`        | `8`          |
+|                     |              |              |
 
 """
 class(ss::StrideData) = classes[ss.sstype]
+class(sscode::Int) = classes[code_to_ss[sscode]]
+class(sstype::String) = classes[sstype]
 
 @doc """
     is_helix(ss::StrideData)
@@ -219,17 +243,12 @@ function ss_frame!(
    coordinates = Chemfiles.positions(frame)
    for (i,col) in enumerate(eachcol(coordinates))
        if i in atom_indices
-          x, y, z = col[1], col[2], col[3]
-          atoms[i].x = x
-          atoms[i].y = y
-          atoms[i].z = z
+          atoms[i].x = col[1]
+          atoms[i].y = col[2]
+          atoms[i].z = col[3]
        end
    end
-   tmp_file = tempname()
-   PDBTools.writePDB(atoms, tmp_file)
-   ss = secondary_structure(tmp_file)
-   rm(tmp_file) 
-   return ss
+   return secondary_structure(atoms)
 end
 
 """
@@ -280,7 +299,7 @@ function ss_map(
     for (iframe, frame) in enumerate(trajectory)
         ss = ss_frame!(atoms, atom_indices, frame)
         for (i, ssdata) in pairs(ss)
-            ss_map[i,iframe] = ss_code[ssdata.sstype]
+            ss_map[i,iframe] = sscode[ssdata.sstype]
         end
     end
     return ss_map
