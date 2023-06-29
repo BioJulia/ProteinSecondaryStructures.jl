@@ -168,7 +168,6 @@ The secondary structure classes are:
 | `"beta bridge"`     | `"B"`        | `6`          |
 | `"bend"`            | `"S"`        | `7`          |
 | `"coil"`            | `"C"`        | `8`          |
-|                     |              |              |
 
 """
 class(ss::StrideData) = classes[ss.sstype]

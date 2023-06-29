@@ -109,7 +109,6 @@ The classes of secondary structure and their codes are:
 | `"beta bridge"`     | `"B"`        | `6`          |
 | `"bend"`            | `"S"`        | `7`          |
 | `"coil"`            | `"C"`        | `8`          |
-|                     |              |              |
 
 See the [DSSP secondary structure classification](https://en.wikipedia.org/wiki/Protein_secondary_structure) for further information.
 
