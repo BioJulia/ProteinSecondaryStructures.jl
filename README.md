@@ -95,6 +95,26 @@ struct StrideData
 end
 ```
 
+### Classes of secondary structure
+
+The classes of secondary structure and their codes are:
+
+| Secondary structure | `sstype`     | `ss_code`    |
+|---------------------|:------------:|:------------:|
+| `"310 helix"`       | `"G"`        | `1`          | 
+| `"alpha helix"`     | `"H"`        | `2`          |
+| `"pi helix"`        | `"I"`        | `3`          |
+| `"turn"`            | `"T"`        | `4`          |
+| `"beta strand"`     | `"E"`        | `5`          |
+| `"beta bridge"`     | `"B"`        | `6`          |
+| `"bend"`            | `"S"`        | `7`          |
+| `"coil"`            | `"C"`        | `8`          |
+|                     |              |              |
+
+See the [DSSP secondary structure classification](https://en.wikipedia.org/wiki/Protein_secondary_structure) for further information.
+
+### Secondary structure composition
+
 It is possible to extract the composition of the secondary structure with:
 
 ```julia
@@ -151,7 +171,6 @@ is_helix
 is_alphahelix
 is_pihelix
 is_310helix
-
 is_strand
 is_betastrand
 is_betabridge
@@ -159,8 +178,6 @@ is_turn
 is_bend
 is_coil
 ```
-
-See the [DSSP secondary structure classification](https://en.wikipedia.org/wiki/Protein_secondary_structure) for further information.
 
 ### Computing the secondary structure in a trajectory 
 
@@ -199,19 +216,7 @@ producing the figure:
 
 ![heatmap](./test/map.png)
 
-where the colors refer to the following scale:
-```julia
-const ss_code = Dict{String,Int}(
-    "G" => 1,
-    "H" => 2,
-    "I" => 3,
-    "T" => 4,
-    "E" => 5,
-    "B" => 6,
-    "S" => 7,
-    "C" => 8,
-)
-```
+where the colors refer to the `sscode` fields of the [classes table](#classes-of-secondary-structure) above.
 
 ## Note
 
