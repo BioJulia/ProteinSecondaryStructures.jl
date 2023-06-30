@@ -1,6 +1,6 @@
-using Stride
-using Test
+using TestItemRunner
+@run_package_tests
 
-@testset "Stride.jl" begin
-    # Write your tests here.
-end
+
+
+

@@ -1,12 +1,14 @@
 module Stride
 
 using TestItems
-
 import Chemfiles
 import PDBTools
 
-export StrideData
-export secondary_structure
+export SSData
+
+export stride_run
+export dssp_run 
+
 export is_helix, is_alphahelix, is_pihelix, is_310helix 
 export is_strand, is_betastrand, is_betabridge
 export is_bend, is_coil, is_turn
@@ -15,106 +17,27 @@ export ss_composition
 export ss_content
 export ss_map
 
-# Assume "stride" is in the path
-stride_exec = "stride"
-
 import Base: @kwdef # for 1.6 compatibility
-@kwdef struct StrideData
+@kwdef struct SSData 
     resname::String
     chain::String
     residue::Int
     resnum::Int
-    sstype::String
+    sscode::String
     phi::Float64
     psi::Float64
-    area::Float64
+    area::Float64 = 0.0 # stride only
+    kappa::Float64 = 0.0 # dssp only
+    alpha::Float64 = 0.0 # dssp only
 end
 
-"""
-    secondary_structure(pdb_file::String)
-    secondary_structure(atoms::AbstractVector{<:PDBTools.Atom})
+# Stride interface
+include("./stride.jl")
 
-Run stride on the pdb file and return a vector containing the `stride` detailed
-secondary structure information for each residue.
+# DSSP interface
+include("./dssp.jl")
 
-The `stride` executable must be in the path or, alternatively, the `Stride.stride_exec`
-variable can be set to the full path of the executable.
-
-"""
-function secondary_structure end
-
-function secondary_structure(pdb_file::String)
-    # Run stride on the pdb file
-    stride_raw_data = readchomp(pipeline(`$stride_exec $pdb_file`))
-    ssvector = StrideData[]
-    for line in split(stride_raw_data, "\n")
-        if startswith(line, "ASG")
-            residue_data = split(line)
-            push!(ssvector,
-                StrideData(
-                    resname = residue_data[2],
-                    chain = residue_data[3],
-                    residue = parse(Int, residue_data[4]),
-                    resnum = parse(Int, residue_data[5]),
-                    sstype = residue_data[6],
-                    phi = parse(Float64, residue_data[8]),
-                    psi = parse(Float64, residue_data[9]),
-                    area = parse(Float64, residue_data[10])
-                )
-            )
-        end
-    end
-    return ssvector
-end
-
-@testitem "from pdb file" begin
-    using Stride.Testing
-    pdbfile = joinpath(Testing.data_dir,"pdb","pdb1fmc.pdb")
-    ss = secondary_structure(pdbfile)
-    @test length(ss) == 510
-    @test ss_composition(ss) == Dict{String, Int}(
-        "3₁₀ helix" => 21, 
-        "bend" => 0, 
-        "turn" => 70, 
-        "helix" => 263, 
-        "beta strand" => 77, 
-        "alpha helix" => 242, 
-        "pi helix" => 0, 
-        "beta bridge" => 4, 
-        "strand" => 81, 
-        "coil" => 96
-    )
-end
-
-function secondary_structure(atoms::AbstractVector{<:PDBTools.Atom})
-    tmp_file = tempname()
-    PDBTools.writePDB(atoms, tmp_file)
-    ss = secondary_structure(tmp_file)
-    rm(tmp_file)
-    return ss
-end
-
-@testitem "from Vector{<:PDBTools.Atom}" begin
-    using Stride.Testing
-    using PDBTools
-    pdbfile = joinpath(Testing.data_dir,"pdb","pdb1fmc.pdb")
-    atoms = readPDB(pdbfile, "protein and chain A")
-    ss = secondary_structure(atoms)
-    @test length(ss) == 255 
-    @test ss_composition(ss) == Dict{String, Int}(
-        "310 helix"   => 11,
-        "bend"        => 0,
-        "turn"        => 34,
-        "helix"       => 132,
-        "beta strand" => 39,
-        "alpha helix" => 121,
-        "pi helix"    => 0,
-        "beta bridge" => 2,
-        "strand"      => 41,
-        "coil"        => 48,
-    )
-end
-
+# Common interface 
 const classes = Dict{String,String}(
     "G" => "310 helix",
     "H" => "alpha helix",
@@ -124,9 +47,10 @@ const classes = Dict{String,String}(
     "B" => "beta bridge",
     "S" => "bend",
     "C" => "coil",
+    " " => "loop",
 )
 
-const sscode = Dict{String,Int}(
+const ssenum = Dict{String,Int}(
     "G" => 1, # 310 helix
     "H" => 2, # alpha helix
     "I" => 3, # pi helix
@@ -135,6 +59,7 @@ const sscode = Dict{String,Int}(
     "B" => 6, # beta bridge
     "S" => 7, # bend
     "C" => 8, # coil
+    " " => 9, # loop
 )
 
 const code_to_ss = Dict{Int,String}(
@@ -146,19 +71,18 @@ const code_to_ss = Dict{Int,String}(
    6 => "B", # beta bridge
    7 => "S", # bend
    8 => "C", # coil
+   9 => " ", # loop
 )
 
 """
-    class(ss::StrideData)
-    class(sscode::Int)
-    class(sstype::String)
+    class(ss::Union{SSData, SSData, Int, String})
 
-Return the secondary structure class. The input may be a `StrideData` object, 
+Return the secondary structure class. The input may be a `SSData` object, 
 a secondary structure `Int` code (1-8) or a secondary structure type string (`G, H, ..., C`).
 
 The secondary structure classes are:
 
-| Secondary structure | `sstype`     | `sscode`    |
+| Secondary structure | `sscode`     | `ssenum`    |
 |:--------------------|:------------:|:------------:|
 | `"310 helix"`       | `"G"`        | `1`          | 
 | `"alpha helix"`     | `"H"`        | `2`          |
@@ -168,48 +92,51 @@ The secondary structure classes are:
 | `"beta bridge"`     | `"B"`        | `6`          |
 | `"bend"`            | `"S"`        | `7`          |
 | `"coil"`            | `"C"`        | `8`          |
+| `"loop"`            | `" "`        | `9`          |
 
 """
-class(ss::StrideData) = classes[ss.sstype]
-class(sscode::Int) = classes[code_to_ss[sscode]]
-class(sstype::String) = classes[sstype]
+class(ss::SSData) = classes[ss.sscode]
+class(ssenum::Int) = classes[code_to_ss[ssenum]]
+class(sscode::String) = classes[sscode]
 
 @doc """
-    is_helix(ss::StrideData)
-    is_alphahelix(ss::StrideData)
-    is_pihelix(ss::StrideData)
-    is_310helix(ss::StrideData)
-    is_strand(ss::StrideData)
-    is_betastrand(ss::StrideData)
-    is_betabridge(ss::StrideData)
-    is_turn(ss::StrideData)
-    is_bend(ss::StrideData)
-    is_coil(ss::StrideData)
+    is_helix(ss::SSData)
+    is_alphahelix(ss::SSData)
+    is_pihelix(ss::SSData)
+    is_310helix(ss::SSData)
+    is_strand(ss::SSData)
+    is_betastrand(ss::SSData)
+    is_betabridge(ss::SSData)
+    is_turn(ss::SSData)
+    is_bend(ss::SSData)
+    is_coil(ss::SSData)
+    is_turn(ss::SSData)
 
 Return `true` if the data is of the given secondary structure type.
 
 """
 function is_function end
 
-@doc (@doc is_function) is_helix(ss::StrideData) = ss.sstype in ("H", "G", "I")
-@doc (@doc is_function) is_alphahelix(ss::StrideData) = ss.sstype == "H"
-@doc (@doc is_function) is_pihelix(ss::StrideData) = ss.sstype == "I"
-@doc (@doc is_function) is_310helix(ss::StrideData) = ss.sstype == "G"
-@doc (@doc is_function) is_strand(ss::StrideData) = ss.sstype in ("E", "B")
-@doc (@doc is_function) is_betastrand(ss::StrideData) = ss.sstype == "E"
-@doc (@doc is_function) is_betabridge(ss::StrideData) = ss.sstype == "B"
-@doc (@doc is_function) is_turn(ss::StrideData) = ss.sstype == "T"
-@doc (@doc is_function) is_bend(ss::StrideData) = ss.sstype == "S"
-@doc (@doc is_function) is_coil(ss::StrideData) = ss.sstype == "C"
+@doc (@doc is_function) is_helix(ss::SSData) = ss.sscode in ("H", "G", "I")
+@doc (@doc is_function) is_alphahelix(ss::SSData) = ss.sscode == "H"
+@doc (@doc is_function) is_pihelix(ss::SSData) = ss.sscode == "I"
+@doc (@doc is_function) is_310helix(ss::SSData) = ss.sscode == "G"
+@doc (@doc is_function) is_strand(ss::SSData) = ss.sscode in ("E", "B")
+@doc (@doc is_function) is_betastrand(ss::SSData) = ss.sscode == "E"
+@doc (@doc is_function) is_betabridge(ss::SSData) = ss.sscode == "B"
+@doc (@doc is_function) is_turn(ss::SSData) = ss.sscode == "T"
+@doc (@doc is_function) is_bend(ss::SSData) = ss.sscode == "S"
+@doc (@doc is_function) is_coil(ss::SSData) = ss.sscode == "C"
+@doc (@doc is_function) is_loop(ss::SSData) = ss.sscode == " "
 
 """
-    ss_composition(data::AbstractVector{<:StrideData})
+    ss_composition(data::AbstractVector{<:SSData})
 
 Calculate the secondary structure composition of the data. Returns a dictionary of
 the secondary structure types and their counts.
 
 """
-function ss_composition(data::AbstractVector{<:StrideData})
+function ss_composition(data::AbstractVector{<:SSData})
     helix = count(is_helix, data)
     alpha_helix = count(is_alphahelix, data)
     pihelix = count(is_pihelix, data)
@@ -220,100 +147,24 @@ function ss_composition(data::AbstractVector{<:StrideData})
     turn = count(is_turn, data)
     bend = count(is_bend, data)
     coil = count(is_coil, data)
+    loop = count(is_loop, data)
     return Dict(
         "helix" => helix,
         "alpha helix" => alpha_helix,
         "pi helix" => pihelix,
-        "3₁₀ helix" => helix310,
+        "310 helix" => helix310,
         "strand" => strand,
         "beta strand" => betastrand,
         "beta bridge" => betabridge,
         "turn" => turn,
         "bend" => bend,
         "coil" => coil,
+        "loop" => loop,
     )
 end
 
-function ss_frame!(
-    atoms::AbstractVector{<:PDBTools.Atom},
-    atom_indices::Vector{Int},
-    frame::Chemfiles.Frame,
-)
-   coordinates = Chemfiles.positions(frame)
-   for (i,col) in enumerate(eachcol(coordinates))
-       if i in atom_indices
-          atoms[i].x = col[1]
-          atoms[i].y = col[2]
-          atoms[i].z = col[3]
-       end
-   end
-   return secondary_structure(atoms)
-end
-
-"""
-    ss_content(f::F, atoms::AbstractVector{<:PDBTools.Atom}, trajectory::Chemfiles.Trajectory)
-
-Calculate the secondary structure content of the trajectory. `f` is the function that returns,
-for each residue, if the secondary structure is of a certain type. For example, to calculate 
-the alpha helix content, use `f = is_alphahelix`.
-
-"""
-function ss_content(
-    f::F, 
-    atoms::AbstractVector{<:PDBTools.Atom}, 
-    trajectory::Chemfiles.Trajectory, 
-) where {F<:Function}
-    atom_indices = [atom.index for atom in atoms]
-    ss_content = zeros(Float64, length(trajectory))
-    for (iframe,frame) in enumerate(trajectory)
-        ss = ss_frame!(atoms, atom_indices, frame)
-        ss_content[iframe] = count(f, ss) / length(ss)
-    end
-    return ss_content
-end
-
-@testitem "ss_content" begin
-    using Stride.Testing
-    using PDBTools
-    using Chemfiles
-    pdbfile = joinpath(Testing.data_dir,"Gromacs","system.pdb")
-    trajectory = Trajectory(joinpath(Testing.data_dir,"Gromacs","trajectory.xtc"))
-    helical_content = ss_content(is_helix, readPDB(pdbfile, "protein"), trajectory)
-    @test length(helical_content) == 26
-    @test sum(helical_content)/length(helical_content) ≈ 0.2181174089068826
-end
-
-"""
-    ss_map(atoms::AbstractVector{<:PDBTools.Atom}, trajectory::Chemfiles.Trajectory)
-
-Calculate the secondary structure map of the trajectory. Returns a matrix of the secondary.
-
-"""
-function ss_map(
-    atoms::AbstractVector{<:PDBTools.Atom},
-    trajectory::Chemfiles.Trajectory,
-)
-    atom_indices = [atom.index for atom in atoms]
-    ss_map = zeros(Int,length(PDBTools.eachresidue(atoms)), length(trajectory))
-    for (iframe, frame) in enumerate(trajectory)
-        ss = ss_frame!(atoms, atom_indices, frame)
-        for (i, ssdata) in pairs(ss)
-            ss_map[i,iframe] = sscode[ssdata.sstype]
-        end
-    end
-    return ss_map
-end
-
-@testitem "ss_map" begin
-    using Stride.Testing
-    using PDBTools
-    using Chemfiles
-    pdbfile = joinpath(Testing.data_dir,"Gromacs","system.pdb")
-    trajectory = Trajectory(joinpath(Testing.data_dir,"Gromacs","trajectory.xtc"))
-    ssmap = ss_map(readPDB(pdbfile, "protein"), trajectory)
-    @test size(ssmap) == (76, 26)
-    @test sum(ssmap) == 9032
-end
+# Trajectory analysis
+include("./trajectories.jl")
 
 # Testing module
 include("../test/Testing.jl")

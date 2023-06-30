@@ -41,11 +41,11 @@ julia> using Stride
 julia> pdbfile = "pdb1fmc.pdb"
 
 julia> ss = secondary_structure(pdbfile)
-510-element Vector{Stride.StrideData}:
- StrideData("MET", "A", 1, 1, "C", 360.0, 150.62, 234.4)
- StrideData("PHE", "A", 2, 2, "C", -69.01, 138.78, 162.9)
+510-element Vector{Stride.SSData}:
+ SSData("MET", "A", 1, 1, "C", 360.0, 150.62, 234.4)
+ SSData("PHE", "A", 2, 2, "C", -69.01, 138.78, 162.9)
  
- StrideData("ASN", "B", 255, 255, "C", -130.75, 360.0, 114.8)
+ SSData("ASN", "B", 255, 255, "C", -130.75, 360.0, 114.8)
 ```
 
 ### Computing from a selection of atoms using PDBTools
@@ -71,24 +71,24 @@ julia> pdb = readPDB(pdbfile, "protein and chain A") # read only protein atoms f
     1876  OXT     ASN     A      255      255   44.876   38.278   -2.437  1.00 54.24     1       -      1876
 
 julia> ss = secondary_structure(pdb)
-255-element Vector{StrideData}:
- StrideData("MET", "A", 1, 1, "C", 360.0, 150.62, 234.4)
- StrideData("PHE", "A", 2, 2, "C", -69.01, 138.78, 162.9)
+255-element Vector{SSData}:
+ SSData("MET", "A", 1, 1, "C", 360.0, 150.62, 234.4)
+ SSData("PHE", "A", 2, 2, "C", -69.01, 138.78, 162.9)
  ⋮
- StrideData("ASN", "A", 255, 255, "C", -130.97, 360.0, 100.9)
+ SSData("ASN", "A", 255, 255, "C", -130.97, 360.0, 100.9)
 ```
 
 ## Interpretation of the output
 
-The output is a vector of `StrideData` elements, with the following data, for each residue:
+The output is a vector of `SSData` elements, with the following data, for each residue:
 
 ```julia
-struct StrideData
+struct SSData
     resname::String
     chain::String
     residue::Int
     resnum::Int
-    sstype::String
+    sscode::String
     phi::Float64
     psi::Float64
     area::Float64
@@ -99,7 +99,7 @@ end
 
 The classes of secondary structure and their codes are:
 
-| Secondary structure | `sstype`     | `sscode`    |
+| Secondary structure | `sscode`     | `ssenum`    |
 |---------------------|:------------:|:------------:|
 | `"310 helix"`       | `"G"`        | `1`          | 
 | `"alpha helix"`     | `"H"`        | `2`          |
@@ -138,7 +138,7 @@ The class of secondary structure of each residue can be retrived with the `class
 
 ```julia
 julia> ss[10]
-StrideData("ASP", "A", 10, 10, "T", -53.61, 124.03, 78.7)
+SSData("ASP", "A", 10, 10, "T", -53.61, 124.03, 78.7)
 
 julia> class(ss[10])
 "turn"
@@ -215,7 +215,7 @@ producing the figure:
 
 ![heatmap](./test/map.png)
 
-where the colors refer to the `sscode` fields of the [classes table](#classes-of-secondary-structure) above.
+where the colors refer to the `ssenum` fields of the [classes table](#classes-of-secondary-structure) above.
 
 ## Note
 
