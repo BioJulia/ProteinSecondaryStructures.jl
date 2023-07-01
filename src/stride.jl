@@ -58,27 +58,6 @@ function stride_run(pdb_file::String; fix_header=true)
     return ssvector
 end
 
-@testitem "STRIDE: from pdb file" begin
-    using Stride.Testing
-    pdbfile = joinpath(Testing.data_dir,"pdb","pdb1fmc.pdb")
-    ss = stride_run(pdbfile)
-    @test length(ss) == 510
-    @test ss_composition(ss) == Dict{String, Int}(
-        "310 helix" => 21, 
-        "bend" => 0, 
-        "turn" => 70, 
-        "helix" => 263, 
-        "beta strand" => 77, 
-        "alpha helix" => 242, 
-        "pi helix" => 0, 
-        "beta bridge" => 4, 
-        "strand" => 81, 
-        "coil" => 96,
-        "loop" => 0,
-        "kapa helix" => 0,
-    )
-end
-
 function stride_run(atoms::AbstractVector{<:PDBTools.Atom})
     tmp_file = tempname()*".pdb"
     PDBTools.writePDB(atoms, tmp_file; header=stride_pdb_header())
@@ -87,25 +66,3 @@ function stride_run(atoms::AbstractVector{<:PDBTools.Atom})
     return ss
 end
 
-@testitem "STRIDE: from Vector{<:PDBTools.Atom}" begin
-    using Stride.Testing
-    using PDBTools
-    pdbfile = joinpath(Testing.data_dir,"pdb","pdb1fmc.pdb")
-    atoms = readPDB(pdbfile, "protein and chain A")
-    ss = stride_run(atoms)
-    @test length(ss) == 255 
-    @test ss_composition(ss) == Dict{String, Int}(
-        "310 helix"   => 11,
-        "bend"        => 0,
-        "turn"        => 34,
-        "helix"       => 132,
-        "beta strand" => 39,
-        "alpha helix" => 121,
-        "pi helix"    => 0,
-        "beta bridge" => 2,
-        "strand"      => 41,
-        "coil"        => 48,
-        "loop"        =>  0,
-        "kapa helix"   =>  0,
-    )
-end

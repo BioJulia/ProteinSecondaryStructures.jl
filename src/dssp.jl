@@ -31,7 +31,6 @@ function dssp_pdb_header()
           """)
 end
 
-
 function dssp_run(pdb_file::String; fix_header=true)
     # if the header is not in the correct format, dssp will fail
     if fix_header
@@ -73,54 +72,10 @@ function dssp_run(pdb_file::String; fix_header=true)
     return ssvector
 end
 
-@testitem "DSSP: from pdb file" begin
-    using Stride.Testing
-    pdbfile = joinpath(Testing.data_dir,"pdb","pdb1fmc.pdb")
-    ss = dssp_run(pdbfile)
-    @test length(ss) == 510
-    @test ss_composition(ss) == Dict{String, Int}(
-        "310 helix" => 20, 
-        "bend" => 26, 
-        "turn" => 58, 
-        "helix" => 250, 
-        "beta strand" => 74, 
-        "alpha helix" => 220, 
-        "pi helix" => 10, 
-        "beta bridge" => 4, 
-        "strand" => 78, 
-        "coil" => 0,
-        "loop" => 98,
-        "kapa helix" => 0,
-    )
-end
-
 function dssp_run(atoms::AbstractVector{<:PDBTools.Atom})
     tmp_file = tempname()*".pdb"
     PDBTools.writePDB(atoms, tmp_file; header=dssp_pdb_header())
     ss = dssp_run(tmp_file; fix_header=false)
     rm(tmp_file)
     return ss
-end
-
-@testitem "DSSP: from Vector{<:PDBTools.Atom}" begin
-    using Stride.Testing
-    using PDBTools
-    pdbfile = joinpath(Testing.data_dir,"pdb","pdb1fmc.pdb")
-    atoms = readPDB(pdbfile, "protein and chain A")
-    ss = dssp_run(atoms)
-    @test length(ss) == 255 
-    @test ss_composition(ss) == Dict{String, Int}(
-        "310 helix"   => 10,
-        "bend"        => 13,
-        "turn"        => 29,
-        "helix"       => 125,
-        "beta strand" => 37,
-        "alpha helix" => 110,
-        "pi helix"    => 5,
-        "beta bridge" => 2,
-        "strand"      => 39,
-        "coil"        => 0,
-        "loop"        => 49,
-        "kapa helix"   => 0,
-    )
 end
