@@ -75,6 +75,7 @@ end
         "strand" => 81, 
         "coil" => 96,
         "loop" => 0,
+        "pII helix" => 0,
     )
 end
 
@@ -105,5 +106,6 @@ end
         "strand"      => 41,
         "coil"        => 48,
         "loop"        =>  0,
+        "pII helix"   =>  0,
     )
 end

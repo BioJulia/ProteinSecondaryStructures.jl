@@ -90,9 +90,9 @@ end
     # With stride
     ssmap = ss_map(PDBTools.readPDB(pdbfile, "protein"), trajectory; method=stride_run)
     @test size(ssmap) == (76, 26)
-    @test sum(ssmap) == 9032
+    @test sum(ssmap) == 10577
     # With DSSP
     ssmap = ss_map(PDBTools.readPDB(pdbfile, "protein"), trajectory; method=dssp_run)
     @test size(ssmap) == (76, 26)
-    @test sum(ssmap) == 9032
+    @test sum(ssmap) == 10995
 end
