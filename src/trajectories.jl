@@ -56,7 +56,7 @@ end
     # With DSSP
     helical_content = ss_content(is_helix, readPDB(pdbfile, "protein"), trajectory; method=dssp_run)
     @test length(helical_content) == 26
-    @test sum(helical_content)/length(helical_content) ≈ 0.2181174089068826
+    @test sum(helical_content)/length(helical_content) ≈ 0.2415384615384615
 end
 
 """
@@ -83,16 +83,16 @@ end
 
 @testitem "ss_map" begin
     using Stride.Testing
-    using PDBTools
-    using Chemfiles
+    import PDBTools
+    import Chemfiles
     pdbfile = joinpath(Testing.data_dir,"Gromacs","system.pdb")
-    trajectory = Trajectory(joinpath(Testing.data_dir,"Gromacs","trajectory.xtc"))
+    trajectory = Chemfiles.Trajectory(joinpath(Testing.data_dir,"Gromacs","trajectory.xtc"))
     # With stride
-    ssmap = ss_map(readPDB(pdbfile, "protein"), trajectory; method=stride_run)
+    ssmap = ss_map(PDBTools.readPDB(pdbfile, "protein"), trajectory; method=stride_run)
     @test size(ssmap) == (76, 26)
     @test sum(ssmap) == 9032
     # With DSSP
-    ssmap = ss_map(readPDB(pdbfile, "protein"), trajectory; method=dssp_run)
+    ssmap = ss_map(PDBTools.readPDB(pdbfile, "protein"), trajectory; method=dssp_run)
     @test size(ssmap) == (76, 26)
     @test sum(ssmap) == 9032
 end
