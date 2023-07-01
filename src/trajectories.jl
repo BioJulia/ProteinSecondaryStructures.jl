@@ -58,6 +58,11 @@ end
     helical_content = ss_content(is_helix, readPDB(pdbfile, "protein"), trajectory; method=dssp_run)
     @test length(helical_content) == 26
     @test sum(helical_content)/length(helical_content) ≈ 0.2415384615384615
+    # With non-contiguous indexing
+    atoms = readPDB(pdbfile, only = at -> (10 <= at.residue < 30) | (40 <= at.residue < 60))
+    helical_content = ss_content(is_helix, atoms, trajectory; method=stride_run)
+    @test length(helical_content) == 26
+    @test sum(helical_content)/length(helical_content) ≈ 0.20288461538461539
 end
 
 """
