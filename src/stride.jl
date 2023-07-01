@@ -18,9 +18,25 @@ variable can be set to the full path of the executable.
 """
 function stride_run end
 
-function stride_run(pdb_file::String)
+function stride_pdb_header() 
+    chomp(
+        """  
+        HEADER    ABC  PROTEIN                               01-JAN-00   1ABC
+        CRYST1
+        """)
+end
+
+function stride_run(pdb_file::String; fix_header=true)
+    # If the header is not in the correct format, stride will fail
+    if fix_header
+        atoms = PDBTools.readPDB(pdb_file, "protein")
+        tmp_file = tempname()*".pdb"
+        writePDB(atoms, tmp_file; header=stride_pdb_header())
+    else
+        tmp_file = pdb_file
+    end
     # Run stride on the pdb file
-    stride_raw_data = readchomp(pipeline(`$stride_executable $pdb_file`))
+    stride_raw_data = readchomp(pipeline(`$stride_executable $tmp_file`))
     ssvector = SSData[]
     for line in split(stride_raw_data, "\n")
         if startswith(line, "ASG")
@@ -64,8 +80,8 @@ end
 
 function stride_run(atoms::AbstractVector{<:PDBTools.Atom})
     tmp_file = tempname()*".pdb"
-    PDBTools.writePDB(atoms, tmp_file)
-    ss = stride_run(tmp_file)
+    PDBTools.writePDB(atoms, tmp_file; header=stride_pdb_header())
+    ss = stride_run(tmp_file; fix_header=false)
     rm(tmp_file)
     return ss
 end
