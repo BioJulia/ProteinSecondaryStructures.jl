@@ -95,7 +95,6 @@ end
 
 function dssp_run(atoms::AbstractVector{<:PDBTools.Atom})
     tmp_file = tempname()*".pdb"
-    @show tmp_file
     PDBTools.writePDB(atoms, tmp_file; header=dssp_pdb_header())
     ss = dssp_run(tmp_file; fix_header=false)
     rm(tmp_file)
