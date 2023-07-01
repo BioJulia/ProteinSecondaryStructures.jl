@@ -38,7 +38,7 @@ or go to: https://github.com/PDB-REDO/dssp
 In Julia, install `Stride` with:
 
 ```julia
-import Pkg; Pkg.add("https://github.com/m3g/Stride.jl")
+import Pkg; Pkg.add(url="https://github.com/m3g/Stride.jl")
 ```
 
 ## Usage
