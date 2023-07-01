@@ -19,7 +19,7 @@ variable can be set to the full path of the executable.
 function stride_run end
 
 function stride_pdb_header() 
-    chomp(
+    strip(
         """  
         HEADER    ABC  PROTEIN                               01-JAN-00   1ABC
         CRYST1
