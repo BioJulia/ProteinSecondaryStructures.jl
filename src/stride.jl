@@ -36,7 +36,13 @@ function stride_run(pdb_file::String; fix_header=true)
         tmp_file = pdb_file
     end
     # Run stride on the pdb file
-    stride_raw_data = readchomp(pipeline(`$stride_executable $tmp_file`))
+    stride_raw_data = try 
+        readchomp(pipeline(`$stride_executable $tmp_file`))
+    catch
+        println("WARNING: stride failed for file $tmp_file, returning empty secondary structure vector.")
+        atoms = PDBTools.readPDB(pdb_file, "protein")
+        return [ SSData(r.resname, r.chain, r.residue, r.resnum, " ", 0.0, 0.0, 0.0, 0.0, 0.0) for r in atoms ]
+    end
     ssvector = SSData[]
     for line in split(stride_raw_data, "\n")
         if startswith(line, "ASG")
