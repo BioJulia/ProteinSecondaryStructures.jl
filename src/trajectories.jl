@@ -8,15 +8,16 @@ function ss_frame!(
     frame::Chemfiles.Frame;
     method::F=stride_run,
 ) where {F<:Function}
-   coordinates = Chemfiles.positions(frame)
-   for (i,col) in enumerate(eachcol(coordinates))
-       if i in atom_indices
-          atoms[i].x = col[1]
-          atoms[i].y = col[2]
-          atoms[i].z = col[3]
-       end
-   end
-   return method(atoms)
+    coordinates = Chemfiles.positions(frame)
+    for (i,col) in enumerate(eachcol(coordinates))
+        iatom = findfirst(==(i), atom_indices)
+        if !isnothing(iatom)
+           atoms[iatom].x = col[1]
+           atoms[iatom].y = col[2]
+           atoms[iatom].z = col[3]
+        end
+    end
+    return method(atoms)
 end
 
 
