@@ -90,7 +90,7 @@ end
         "strand" => 78, 
         "coil" => 0,
         "loop" => 98,
-        "pII helix" => 0,
+        "kapa helix" => 0,
     )
 end
 
@@ -121,6 +121,6 @@ end
         "strand"      => 39,
         "coil"        => 0,
         "loop"        => 49,
-        "pII helix"   => 0,
+        "kapa helix"   => 0,
     )
 end

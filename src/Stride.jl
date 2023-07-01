@@ -42,7 +42,7 @@ const classes = Dict{String,String}(
     "G" => "310 helix",
     "H" => "alpha helix",
     "I" => "pi helix",
-    "P" => "pII helix",
+    "P" => "kapa helix",
     "T" => "turn",
     "E" => "beta strand",
     "B" => "beta bridge",
@@ -55,7 +55,7 @@ const ssenum = Dict{String,Int}(
     "G" => 1, # 310 helix
     "H" => 2, # alpha helix
     "I" => 3, # pi helix
-    "P" => 4, # pII helix
+    "P" => 4, # kapa helix
     "T" => 5, # turn
     "E" => 6, # beta strand
     "B" => 7, # beta bridge
@@ -68,7 +68,7 @@ const code_to_ss = Dict{Int,String}(
    1 => "G", # 310 helix
    2 => "H", # alpha helix
    3 => "I", # pi helix
-   4 => "P", # pII helix
+   4 => "P", # kapa helix
    5 => "T", # turn
    6 => "E", # beta strand
    7 => "B", # beta bridge
@@ -90,7 +90,7 @@ The secondary structure classes are:
 | `"310 helix"`       | `"G"`        | `1`          | 
 | `"alpha helix"`     | `"H"`        | `2`          |
 | `"pi helix"`        | `"I"`        | `3`          |
-| `"pII helix"`       | `"P"`        | `4`          |
+| `"kapa helix"`       | `"P"`        | `4`          |
 | `"turn"`            | `"T"`        | `5`          |
 | `"beta strand"`     | `"E"`        | `6`          |
 | `"beta bridge"`     | `"B"`        | `7`          |
@@ -107,7 +107,7 @@ class(sscode::String) = classes[sscode]
     is_helix(ss::SSData)
     is_alphahelix(ss::SSData)
     is_pihelix(ss::SSData)
-    is_pIIhelix(ss::SSData)
+    is_kapahelix(ss::SSData)
     is_310helix(ss::SSData)
     is_strand(ss::SSData)
     is_betastrand(ss::SSData)
@@ -125,7 +125,7 @@ function is_function end
 @doc (@doc is_function) is_helix(ss::SSData) = ss.sscode in ("H", "G", "I", "P")
 @doc (@doc is_function) is_alphahelix(ss::SSData) = ss.sscode == "H"
 @doc (@doc is_function) is_pihelix(ss::SSData) = ss.sscode == "I"
-@doc (@doc is_function) is_pIIhelix(ss::SSData) = ss.sscode == "P"
+@doc (@doc is_function) is_kapahelix(ss::SSData) = ss.sscode == "P"
 @doc (@doc is_function) is_310helix(ss::SSData) = ss.sscode == "G"
 @doc (@doc is_function) is_strand(ss::SSData) = ss.sscode in ("E", "B")
 @doc (@doc is_function) is_betastrand(ss::SSData) = ss.sscode == "E"
@@ -146,7 +146,7 @@ function ss_composition(data::AbstractVector{<:SSData})
     helix = count(is_helix, data)
     alpha_helix = count(is_alphahelix, data)
     pihelix = count(is_pihelix, data)
-    pIIhelix = count(is_pIIhelix, data)
+    kapahelix = count(is_kapahelix, data)
     helix310 = count(is_310helix, data)
     strand = count(is_strand, data)
     betastrand = count(is_betastrand, data)
@@ -159,7 +159,7 @@ function ss_composition(data::AbstractVector{<:SSData})
         "helix" => helix,
         "alpha helix" => alpha_helix,
         "pi helix" => pihelix,
-        "pII helix" => pIIhelix,
+        "kapa helix" => kapahelix,
         "310 helix" => helix310,
         "strand" => strand,
         "beta strand" => betastrand,
