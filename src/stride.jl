@@ -31,7 +31,7 @@ function stride_run(pdb_file::String; fix_header=true)
     if fix_header
         atoms = PDBTools.readPDB(pdb_file, "protein")
         tmp_file = tempname()*".pdb"
-        writePDB(atoms, tmp_file; header=stride_pdb_header())
+        PDBTools.writePDB(atoms, tmp_file; header=stride_pdb_header())
     else
         tmp_file = pdb_file
     end
