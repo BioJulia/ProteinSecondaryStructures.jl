@@ -61,7 +61,7 @@ const classes = Dict{String,String}(
     " " => "loop",
 )
 
-const ssenum = Dict{String,Int}(
+const code_to_number = Dict{String,Int}(
     "G" => 1, # 310 helix
     "H" => 2, # alpha helix
     "I" => 3, # pi helix
@@ -74,17 +74,8 @@ const ssenum = Dict{String,Int}(
     " " => 10, # loop
 )
 
-const code_to_ss = Dict{Int,String}(
-   1 => "G", # 310 helix
-   2 => "H", # alpha helix
-   3 => "I", # pi helix
-   4 => "P", # kappa helix
-   5 => "T", # turn
-   6 => "E", # beta strand
-   7 => "B", # beta bridge
-   8 => "S", # bend
-   9 => "C", # coil
-   10 => " ", # loop
+const number_to_code = Dict{Int,String}(
+    code_to_number[key] => key for key in keys(code_to_number)
 )
 
 """
@@ -95,7 +86,7 @@ a secondary structure `Int` code (1-8) or a secondary structure type string (`G,
 
 The secondary structure classes are:
 
-| Secondary structure | `sscode`     | `ssenum`    |
+| Secondary structure | `ss code`    | `code number`|
 |:--------------------|:------------:|:------------:|
 | `"310 helix"`       | `"G"`        | `1`          | 
 | `"alpha helix"`     | `"H"`        | `2`          |
@@ -110,7 +101,7 @@ The secondary structure classes are:
 
 """
 class(ss::SSData) = classes[ss.sscode]
-class(ssenum::Int) = classes[code_to_ss[ssenum]]
+class(code_number::Int) = classes[number_to_code[code_number]]
 class(sscode::String) = classes[sscode]
 
 @doc """
@@ -159,36 +150,6 @@ function ss_composition(data::AbstractVector{<:SSData})
     end
     return sscomposition
 end
-
-
-#
-#    helix = count(is_helix, data)
-#    alpha_helix = count(is_alphahelix, data)
-#    pihelix = count(is_pihelix, data)
-#    kappahelix = count(is_kappahelix, data)
-#    helix310 = count(is_310helix, data)
-#    strand = count(is_strand, data)
-#    betastrand = count(is_betastrand, data)
-#    betabridge = count(is_betabridge, data)
-#    turn = count(is_turn, data)
-#    bend = count(is_bend, data)
-#    coil = count(is_coil, data)
-#    loop = count(is_loop, data)
-#    return Dict(
-#        "helix" => helix,
-#        "alpha helix" => alpha_helix,
-#        "pi helix" => pihelix,
-#        "kappa helix" => kappahelix,
-#        "310 helix" => helix310,
-#        "strand" => strand,
-#        "beta strand" => betastrand,
-#        "beta bridge" => betabridge,
-#        "turn" => turn,
-#        "bend" => bend,
-#        "coil" => coil,
-#        "loop" => loop,
-#    )
-#end
 
 # Trajectory analysis
 include("./trajectories.jl")

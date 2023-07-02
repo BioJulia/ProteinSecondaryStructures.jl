@@ -114,12 +114,12 @@ end
 
 The classes of secondary structure and their codes are:
 
-| Secondary structure | `sscode`     | `ssenum`    |
+| Secondary structure | `ss code`    |`code number` |
 |---------------------|:------------:|:------------:|
 | `"310 helix"`       | `"G"`        | `1`          | 
 | `"alpha helix"`     | `"H"`        | `2`          |
 | `"pi helix"`        | `"I"`        | `3`          |
-| `"kappa helix"`       | `"P"`        | `4`          |
+| `"kappa helix"`     | `"P"`        | `4`          |
 | `"turn"`            | `"T"`        | `5`          |
 | `"beta strand"`     | `"E"`        | `6`          |
 | `"beta bridge"`     | `"B"`        | `7`          |
@@ -231,7 +231,7 @@ producing the figure:
 
 ![heatmap](./test/map.png)
 
-where the colors refer to the `ssenum` fields of the [classes table](#classes-of-secondary-structure) above.
+where the colors refer to the `code number` fields of the [classes table](#classes-of-secondary-structure) above.
 
 ### Computing the ammount of secondary structure classes in a trajectory 
 

@@ -36,7 +36,7 @@ function ss_map(
     @showprogress for (iframe, frame) in enumerate(trajectory)
         ss = ss_frame!(atoms, atom_indices, frame; method=method)
         for (i, ssdata) in pairs(ss)
-            ss_map[i,iframe] = ssenum[ssdata.sscode]
+            ss_map[i,iframe] = code_to_number[ssdata.sscode]
         end
     end
     return ss_map
@@ -81,18 +81,18 @@ function ss_content(
     return ss_content
 end
 
-is_helix(sscode::Int) = code_to_ss[sscode] in ("H", "G", "I", "P")
-is_alphahelix(sscode::Int) = code_to_ss[sscode] == "H"
-is_pihelix(sscode::Int) = code_to_ss[sscode] == "I"
-is_kappahelix(sscode::Int) = code_to_ss[sscode] == "P"
-is_310helix(sscode::Int) = code_to_ss[sscode] == "G"
-is_strand(sscode::Int) = code_to_ss[sscode] in ("E", "B")
-is_betastrand(sscode::Int) = code_to_ss[sscode] == "E"
-is_betabridge(sscode::Int) = code_to_ss[sscode] == "B"
-is_turn(sscode::Int) = code_to_ss[sscode] == "T"
-is_bend(sscode::Int) = code_to_ss[sscode] == "S"
-is_coil(sscode::Int) = code_to_ss[sscode] == "C"
-is_loop(sscode::Int) = code_to_ss[sscode] == " "
+is_helix(sscode::Int) = number_to_code[sscode] in ("H", "G", "I", "P")
+is_alphahelix(sscode::Int) = number_to_code[sscode] == "H"
+is_pihelix(sscode::Int) = number_to_code[sscode] == "I"
+is_kappahelix(sscode::Int) = number_to_code[sscode] == "P"
+is_310helix(sscode::Int) = number_to_code[sscode] == "G"
+is_strand(sscode::Int) = number_to_code[sscode] in ("E", "B")
+is_betastrand(sscode::Int) = number_to_code[sscode] == "E"
+is_betabridge(sscode::Int) = number_to_code[sscode] == "B"
+is_turn(sscode::Int) = number_to_code[sscode] == "T"
+is_bend(sscode::Int) = number_to_code[sscode] == "S"
+is_coil(sscode::Int) = number_to_code[sscode] == "C"
+is_loop(sscode::Int) = number_to_code[sscode] == " "
 
 """
     ss_content(f::F, ssmap::AbstractMatrix{Int})
@@ -151,7 +151,7 @@ the secondary structure types and their counts, for the given frame.
 function ss_composition(ssmap::AbstractMatrix{Int}, iframe::Int)
     sscomposition = Dict{String,Int}()
     sscodes = @view(ssmap[:,iframe])
-    for sscode in keys(code_to_ss)
+    for sscode in keys(number_to_code)
         sscomposition[class(sscode)] = count(==(sscode), sscodes)    
     end
     return sscomposition
