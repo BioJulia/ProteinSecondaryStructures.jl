@@ -153,33 +153,42 @@ the secondary structure types and their counts.
 
 """
 function ss_composition(data::AbstractVector{<:SSData})
-    helix = count(is_helix, data)
-    alpha_helix = count(is_alphahelix, data)
-    pihelix = count(is_pihelix, data)
-    kappahelix = count(is_kappahelix, data)
-    helix310 = count(is_310helix, data)
-    strand = count(is_strand, data)
-    betastrand = count(is_betastrand, data)
-    betabridge = count(is_betabridge, data)
-    turn = count(is_turn, data)
-    bend = count(is_bend, data)
-    coil = count(is_coil, data)
-    loop = count(is_loop, data)
-    return Dict(
-        "helix" => helix,
-        "alpha helix" => alpha_helix,
-        "pi helix" => pihelix,
-        "kappa helix" => kappahelix,
-        "310 helix" => helix310,
-        "strand" => strand,
-        "beta strand" => betastrand,
-        "beta bridge" => betabridge,
-        "turn" => turn,
-        "bend" => bend,
-        "coil" => coil,
-        "loop" => loop,
-    )
+    sscomposition = Dict{String,Int}()
+    for sscode in keys(classes)
+        sscomposition[class(sscode)] = count(ss -> ss.sscode == sscode, data)    
+    end
+    return sscomposition
 end
+
+
+#
+#    helix = count(is_helix, data)
+#    alpha_helix = count(is_alphahelix, data)
+#    pihelix = count(is_pihelix, data)
+#    kappahelix = count(is_kappahelix, data)
+#    helix310 = count(is_310helix, data)
+#    strand = count(is_strand, data)
+#    betastrand = count(is_betastrand, data)
+#    betabridge = count(is_betabridge, data)
+#    turn = count(is_turn, data)
+#    bend = count(is_bend, data)
+#    coil = count(is_coil, data)
+#    loop = count(is_loop, data)
+#    return Dict(
+#        "helix" => helix,
+#        "alpha helix" => alpha_helix,
+#        "pi helix" => pihelix,
+#        "kappa helix" => kappahelix,
+#        "310 helix" => helix310,
+#        "strand" => strand,
+#        "beta strand" => betastrand,
+#        "beta bridge" => betabridge,
+#        "turn" => turn,
+#        "bend" => bend,
+#        "coil" => coil,
+#        "loop" => loop,
+#    )
+#end
 
 # Trajectory analysis
 include("./trajectories.jl")
