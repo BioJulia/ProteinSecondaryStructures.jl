@@ -98,7 +98,6 @@ The output is a vector of `SSData` elements, with the following data, for each r
 struct SSData
     resname::String
     chain::String
-    residue::Int
     resnum::Int
     sscode::String
     phi::Float64
@@ -118,7 +117,7 @@ The classes of secondary structure and their codes are:
 | `"310 helix"`       | `"G"`        | `1`          | 
 | `"alpha helix"`     | `"H"`        | `2`          |
 | `"pi helix"`        | `"I"`        | `3`          |
-| `"kapa helix"`       | `"P"`        | `4`          |
+| `"kappa helix"`       | `"P"`        | `4`          |
 | `"turn"`            | `"T"`        | `5`          |
 | `"beta strand"`     | `"E"`        | `6`          |
 | `"beta bridge"`     | `"B"`        | `7`          |
@@ -146,7 +145,7 @@ Dict{String, Int64} with 10 entries:
   "strand"      => 41
   "coil"        => 48
   "turn"        => 0
-  "kapa helix"   => 0
+  "kappa helix"   => 0
 
 julia> c["alpha helix"]
 121
@@ -188,7 +187,7 @@ is_helix
 is_alphahelix
 is_pihelix
 is_310helix
-is_kapahelix
+is_kappahelix
 is_strand
 is_betastrand
 is_betabridge
