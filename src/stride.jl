@@ -27,18 +27,17 @@ function stride_pdb_header()
 end
 
 function stride_run(atoms::AbstractVector{<:PDBTools.Atom}; fix_header=true)
+    tmp_file = tempname()*".pdb"
     # If the header is not in the correct format, stride will fail
     if fix_header
-        tmp_file = tempname()*".pdb"
-        PDBTools.writePDB(atoms, tmp_file; header=stride_pdb_header())
+        PDBTools.writePDB(atoms, tmp_file; header=stride_pdb_header(), footer=nothing)
     else
-        tmp_file = pdb_file
+        PDBTools.writePDB(atoms, tmp_file)
     end
     # Run stride on the pdb file
     stride_raw_data = try 
         readchomp(pipeline(`$stride_executable $tmp_file`))
-    catch
-    end
+    catch end
     ssvector = [ SSData(r.resname, r.chain, r.resnum) for r in PDBTools.eachresidue(atoms) ]
     for line in split(stride_raw_data, "\n")
         if startswith(line, "ASG")
@@ -58,6 +57,7 @@ function stride_run(atoms::AbstractVector{<:PDBTools.Atom}; fix_header=true)
             end
         end
     end
+    rm(tmp_file)
     return ssvector
 end
 

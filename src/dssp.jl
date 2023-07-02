@@ -31,6 +31,9 @@ function dssp_pdb_header()
           """)
 end
 
+const dssp_init_line =
+    "  #  RESIDUE AA STRUCTURE BP1 BP2  ACC     N-H-->O    O-->H-N    N-H-->O    O-->H-N    TCO  KAPPA ALPHA  PHI   PSI    X-CA   Y-CA   Z-CA"
+
 # From the PDBTools.Atom vector
 function dssp_run(atoms::AbstractVector{<:PDBTools.Atom}; fix_header=true)
     tmp_file = tempname()*".pdb"
@@ -41,8 +44,6 @@ function dssp_run(atoms::AbstractVector{<:PDBTools.Atom}; fix_header=true)
         PDBTools.writePDB(atoms, tmp_file)
     end
     # Run dssp on the pdb file
-    dssp_init_line =
-    "  #  RESIDUE AA STRUCTURE BP1 BP2  ACC     N-H-->O    O-->H-N    N-H-->O    O-->H-N    TCO  KAPPA ALPHA  PHI   PSI    X-CA   Y-CA   Z-CA"
     dssp_raw_data = try 
         readchomp(pipeline(`$dssp_executable --output-format dssp $tmp_file`))
     catch end
