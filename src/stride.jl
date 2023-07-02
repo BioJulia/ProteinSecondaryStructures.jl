@@ -26,8 +26,7 @@ function stride_pdb_header()
         """)
 end
 
-function stride_run(pdb_file::String; fix_header=true)
-    atoms = PDBTools.readPDB(pdb_file, "protein")
+function stride_run(atoms::AbstractVector{<:PDBTools.Atom}; fix_header=true)
     # If the header is not in the correct format, stride will fail
     if fix_header
         tmp_file = tempname()*".pdb"
@@ -65,11 +64,9 @@ function stride_run(pdb_file::String; fix_header=true)
     return ssvector
 end
 
-function stride_run(atoms::AbstractVector{<:PDBTools.Atom})
-    tmp_file = tempname()*".pdb"
-    PDBTools.writePDB(atoms, tmp_file; header=stride_pdb_header())
-    ss = stride_run(tmp_file; fix_header=false)
-    rm(tmp_file)
-    return ss
+# From a PDB file
+function stride_run(pdb_file::String; fix_header=true) 
+    atoms = PDBTools.readPDB(pdb_file, "protein")
+    return stride_run(atoms; fix_header=fix_header)
 end
 

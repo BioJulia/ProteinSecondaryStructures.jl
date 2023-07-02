@@ -31,23 +31,21 @@ function dssp_pdb_header()
           """)
 end
 
-function dssp_run(pdb_file::String; fix_header=true)
-    atoms = PDBTools.readPDB(pdb_file, "protein")
+# From the PDBTools.Atom vector
+function dssp_run(atoms::AbstractVector{<:PDBTools.Atom}; fix_header=true)
+    tmp_file = tempname()*".pdb"
     # if the header is not in the correct format, dssp will fail
     if fix_header
-        atoms = PDBTools.readPDB(pdb_file, "protein")
-        tmp_file = tempname()*".pdb"
         PDBTools.writePDB(atoms, tmp_file; header=dssp_pdb_header(), footer=nothing)
     else
-        tmp_file = pdb_file
+        PDBTools.writePDB(atoms, tmp_file)
     end
     # Run dssp on the pdb file
     dssp_init_line =
     "  #  RESIDUE AA STRUCTURE BP1 BP2  ACC     N-H-->O    O-->H-N    N-H-->O    O-->H-N    TCO  KAPPA ALPHA  PHI   PSI    X-CA   Y-CA   Z-CA"
     dssp_raw_data = try 
         readchomp(pipeline(`$dssp_executable --output-format dssp $tmp_file`))
-    catch
-    end
+    catch end
     ssvector = [ 
         SSData(r.resname, r.chain, r.resnum, " ", 0.0, 0.0, 0.0, 0.0, 0.0) 
         for r in PDBTools.eachresidue(atoms) 
@@ -75,13 +73,16 @@ function dssp_run(pdb_file::String; fix_header=true)
             ssvector[iss] = ss_residue
         end
     end
+    rm(tmp_file)
     return ssvector
 end
 
-function dssp_run(atoms::AbstractVector{<:PDBTools.Atom})
-    tmp_file = tempname()*".pdb"
-    PDBTools.writePDB(atoms, tmp_file; header=dssp_pdb_header())
-    ss = dssp_run(tmp_file; fix_header=false)
-    rm(tmp_file)
-    return ss
+# From the PDB file
+function dssp_run(pdb_file::String; fix_header=true)
+    atoms = PDBTools.readPDB(pdb_file, "protein")
+    return dssp_run(atoms; fix_header=fix_header)
 end
+
+
+
+
