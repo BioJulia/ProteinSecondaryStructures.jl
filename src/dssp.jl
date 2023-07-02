@@ -32,6 +32,7 @@ function dssp_pdb_header()
 end
 
 function dssp_run(pdb_file::String; fix_header=true)
+    atoms = PDBTools.readPDB(pdb_file, "protein")
     # if the header is not in the correct format, dssp will fail
     if fix_header
         atoms = PDBTools.readPDB(pdb_file, "protein")
@@ -43,10 +44,15 @@ function dssp_run(pdb_file::String; fix_header=true)
     # Run dssp on the pdb file
     dssp_init_line =
     "  #  RESIDUE AA STRUCTURE BP1 BP2  ACC     N-H-->O    O-->H-N    N-H-->O    O-->H-N    TCO  KAPPA ALPHA  PHI   PSI    X-CA   Y-CA   Z-CA"
-    dssp_raw_data = readchomp(pipeline(`$dssp_executable --output-format dssp $tmp_file`))
-    ssvector = SSData[]
+    dssp_raw_data = try 
+        readchomp(pipeline(`$dssp_executable --output-format dssp $tmp_file`))
+    catch
+    end
+    ssvector = [ 
+        SSData(r.resname, r.chain, r.resnum, " ", 0.0, 0.0, 0.0, 0.0, 0.0) 
+        for r in PDBTools.eachresidue(atoms) 
+    ]
     data_begin = false
-    residue = 0
     for line in split(dssp_raw_data, "\n")
         if line == dssp_init_line
             data_begin = true
@@ -54,12 +60,9 @@ function dssp_run(pdb_file::String; fix_header=true)
         end
         !data_begin && continue
         line[14] == '!' && continue
-        residue += 1
-        push!(ssvector,
-            SSData(
+        ss_residue = SSData(
                 resname = PDBTools.threeletter(line[14]),
                 chain = "$(line[12])",
-                residue = residue,
                 resnum = parse(Int, line[6:10]),
                 sscode = "$(line[17])",
                 phi = parse(Float64, line[104:109]),
@@ -67,7 +70,10 @@ function dssp_run(pdb_file::String; fix_header=true)
                 kappa = parse(Float64, line[92:97]),
                 alpha = parse(Float64, line[98:103]),
             )
-        )
+        iss = findfirst(ss -> residue_match(ss_residue, ss), ssvector)
+        if !isnothing(iss)
+            ssvector[iss] = ss_residue
+        end
     end
     return ssvector
 end
