@@ -46,8 +46,8 @@ end
 
 @testitem "ss_content" begin
     using Stride.Testing
-    using PDBTools
-    using Chemfiles
+    using PDBTools: readPDB
+    using Chemfiles: Trajectory
     pdbfile = joinpath(Testing.data_dir,"Gromacs","system.pdb")
     trajectory = Trajectory(joinpath(Testing.data_dir,"Gromacs","trajectory.xtc"))
     # With stride
