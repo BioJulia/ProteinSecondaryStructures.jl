@@ -48,14 +48,15 @@ import Pkg; Pkg.add(url="https://github.com/m3g/Stride.jl")
 ```julia
 julia> using Stride
 
-julia> pdbfile = "pdb1fmc.pdb"
+julia> pdbfile = Stride.Testing.examples[1].filename
+"/home/user/.julia/dev/Stride/test/data/pdb/pdb1fmc.pdb"
 
 julia> ss = stride_run(pdbfile)
 510-element Vector{SSData}:
- SSData("LEU", "A", 7, 7, "G", -104.85, 6.84, 69.1, 0.0, 0.0)
- SSData("ARG", "A", 8, 8, "C", -112.48, 167.49, 95.6, 0.0, 0.0)
+ SSData("MET", "A", 1, "C", 360.0, 150.62, 234.4, 0.0, 0.0)
+ SSData("PHE", "A", 2, "C", -69.01, 138.78, 162.9, 0.0, 0.0)
  ⋮
- SSData("GLY", "B", 248, 248, "T", 69.88, 12.17, 31.8, 0.0, 0.0)
+ SSData("ASN", "B", 255, "C", -130.75, 360.0, 114.8, 0.0, 0.0)
 ```
 
 or use `dssp_run` to use the `dssp` method.
@@ -72,7 +73,8 @@ Then:
 ```julia
 julia> using Stride, PDBTools
 
-julia> pdbfile = "pdb1fmc.pdb"
+julia> pdbfile = Stride.Testing.examples[1].filename
+"/home/user/.julia/dev/Stride/test/data/pdb/pdb1fmc.pdb"
 
 julia> pdb = readPDB(pdbfile, "protein and chain A") # read only protein atoms from chain A
    Array{Atoms,1} with 1876 atoms with fields:
@@ -84,10 +86,10 @@ julia> pdb = readPDB(pdbfile, "protein and chain A") # read only protein atoms f
 
 julia> ss = stride_run(pdb)
 255-element Vector{SSData}:
- SSData("LEU", "A", 7, 7, "G", -104.85, 6.84, 69.1, 0.0, 0.0)
- SSData("ARG", "A", 8, 8, "C", -112.48, 167.49, 95.6, 0.0, 0.0)
+ SSData("MET", "A", 1, "C", 360.0, 150.62, 234.4, 0.0, 0.0)
+ SSData("PHE", "A", 2, "C", -69.01, 138.78, 162.9, 0.0, 0.0)
  ⋮
- SSData("GLY", "A", 248, 248, "T", 72.37, 12.92, 29.5, 0.0, 0.0)
+ SSData("ASN", "A", 255, "C", -130.97, 360.0, 100.9, 0.0, 0.0)
 ```
 
 ## Interpretation of the output
@@ -133,29 +135,29 @@ It is possible to extract the composition of the secondary structure with:
 
 ```julia
 julia> c = ss_composition(ss)
-Dict{String, Int64} with 10 entries:
-  "3₁₀ helix"   => 11
+Dict{String, Int64} with 12 entries:
   "bend"        => 0
-  "turn"        => 34
-  "helix"       => 132
-  "beta strand" => 39
-  "alpha helix" => 121
+  "kappa helix" => 0
+  "beta strand" => 77
+  "strand"      => 81
+  "loop"        => 0
+  "310 helix"   => 21
+  "turn"        => 70
+  "helix"       => 263
+  "beta bridge" => 4
+  "alpha helix" => 242
   "pi helix"    => 0
-  "beta bridge" => 2
-  "strand"      => 41
-  "coil"        => 48
-  "turn"        => 0
-  "kappa helix"   => 0
+  "coil"        => 96
 
 julia> c["alpha helix"]
-121
+242
 ```
 
 The class of secondary structure of each residue can be retrived with the `class` function:
 
 ```julia
 julia> ss[10]
-SSData("ASP", "A", 10, 10, "T", -53.61, 124.03, 78.7, 0.0, 0.0)
+SSData("ASP", "A", 10, "T", -53.61, 124.03, 78.7, 0.0, 0.0)
 
 julia> class(ss[10])
 "turn"
@@ -203,8 +205,11 @@ using Stride
 import PDBTools
 import Chemfiles
 
-atoms = PDBTools.readPDB("system.pdb", "protein and chain A")
-trajectory = Chemfiles.Trajectory("./trajectory.xtc")
+pdbfile = Stride.Testing.data_dir*"/Gromacs/system.pdb"
+trajectory_file = Stride.Testing.data_dir*"/Gromacs/trajectory.xtc"
+
+atoms = PDBTools.readPDB(pdbfile, "protein")
+trajectory = Chemfiles.Trajectory(trajectory_file)
 
 helical_content = ss_content(is_helix, atoms, trajectory)
 ```
@@ -224,8 +229,12 @@ using Stride
 import PDBTools
 import Chemfiles
 
-atoms = PDBTools.readPDB("system.pdb", "protein and chain A")
-trajectory = Chemfiles.Trajectory("./trajectory.xtc")
+
+pdbfile = Stride.Testing.data_dir*"/Gromacs/system.pdb"
+trajectory_file = Stride.Testing.data_dir*"/Gromacs/trajectory.xtc"
+
+atoms = PDBTools.readPDB(pdbfile, "protein")
+trajectory = Chemfiles.Trajectory(trajectory_file)
 
 ssmap = ss_map(atoms, trajectory) # returns a matrix
 ```
