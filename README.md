@@ -198,37 +198,12 @@ is_bend
 is_coil
 ```
 
-### Computing the secondary structure in a trajectory 
-
-```julia
-using Stride
-import PDBTools
-import Chemfiles
-
-pdbfile = Stride.Testing.data_dir*"/Gromacs/system.pdb"
-trajectory_file = Stride.Testing.data_dir*"/Gromacs/trajectory.xtc"
-
-atoms = PDBTools.readPDB(pdbfile, "protein")
-trajectory = Chemfiles.Trajectory(trajectory_file)
-
-helical_content = ss_content(is_helix, atoms, trajectory)
-```
-
-Optionally, the method to compute the secondary structure can be defined, with, for example: 
-
-```julia
-helical_content = ss_content(is_helix, atoms, trajectory; method=stride_run)
-#or
-helical_content = ss_content(is_helix, atoms, trajectory; method=dssp_run)
-```
-
 ### Computing the secondary structure map
 
 ```julia
 using Stride
 import PDBTools
 import Chemfiles
-
 
 pdbfile = Stride.Testing.data_dir*"/Gromacs/system.pdb"
 trajectory_file = Stride.Testing.data_dir*"/Gromacs/trajectory.xtc"
@@ -257,6 +232,66 @@ producing the figure:
 ![heatmap](./test/map.png)
 
 where the colors refer to the `ssenum` fields of the [classes table](#classes-of-secondary-structure) above.
+
+### Computing the ammount of secondary structure classes in a trajectory 
+
+#### From the secondary structure map
+
+Calling `ss_content` with a class identifier function and a map (as computed above), will return the content
+of that class along the trajectory:
+
+```julia
+julia> ss_content(is_alphahelix, ssmap)
+26-element Vector{Float64}:
+ 0.21052631578947367
+ 0.15789473684210525
+ ⋮
+ 0.13157894736842105
+```
+
+The composition of classes for a given frame can also be retrieved from the content map:
+
+```julia
+julia> ss_composition(ssmap, 6)
+Dict{String, Int64} with 10 entries:
+  "310 helix"   => 7
+  "bend"        => 0
+  "turn"        => 17
+  "kappa helix" => 0
+  "beta strand" => 25
+  "beta bridge" => 2
+  "alpha helix" => 12
+  "pi helix"    => 0
+  "loop"        => 0
+  "coil"        => 13
+```
+
+These functions are useful, because the computation of the secondary structure along the
+trajectory (the map) can be costly.
+
+#### For a single class, along the trajectory
+
+```julia
+using Stride
+import PDBTools
+import Chemfiles
+
+pdbfile = Stride.Testing.data_dir*"/Gromacs/system.pdb"
+trajectory_file = Stride.Testing.data_dir*"/Gromacs/trajectory.xtc"
+
+atoms = PDBTools.readPDB(pdbfile, "protein")
+trajectory = Chemfiles.Trajectory(trajectory_file)
+
+helical_content = ss_content(is_helix, atoms, trajectory)
+```
+
+Optionally, the method to compute the secondary structure can be defined, with, for example: 
+
+```julia
+helical_content = ss_content(is_helix, atoms, trajectory; method=stride_run)
+#or
+helical_content = ss_content(is_helix, atoms, trajectory; method=dssp_run)
+```
 
 ## Note
 
