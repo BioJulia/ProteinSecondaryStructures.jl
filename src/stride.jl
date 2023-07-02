@@ -41,7 +41,7 @@ function stride_run(pdb_file::String; fix_header=true)
     catch
     end
     ssvector = [ 
-        SSData(r.resname, r.chain, r.residue, r.resnum, " ", 0.0, 0.0, 0.0, 0.0, 0.0) 
+        SSData(r.resname, r.chain, r.resnum, " ", 0.0, 0.0, 0.0, 0.0, 0.0) 
         for r in PDBTools.eachresidue(atoms) 
     ]
     for line in split(stride_raw_data, "\n")
@@ -51,7 +51,6 @@ function stride_run(pdb_file::String; fix_header=true)
                 resname = residue_data[2],
                 chain = residue_data[3],
                 resnum = parse(Int, residue_data[4]),
-                residue = parse(Int, residue_data[5]),
                 sscode = residue_data[6],
                 phi = parse(Float64, residue_data[8]),
                 psi = parse(Float64, residue_data[9]),
