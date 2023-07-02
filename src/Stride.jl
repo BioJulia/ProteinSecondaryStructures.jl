@@ -1,6 +1,7 @@
 module Stride
 
 using TestItems
+using ProgressMeter
 import Chemfiles
 import PDBTools
 

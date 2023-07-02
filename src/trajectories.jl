@@ -37,7 +37,7 @@ function ss_content(
 ) where {F<:Function, G<:Function}
     atom_indices = [atom.index for atom in atoms]
     ss_content = zeros(Float64, length(trajectory))
-    for (iframe,frame) in enumerate(trajectory)
+    @showprogress for (iframe,frame) in enumerate(trajectory)
         ss = ss_frame!(atoms, atom_indices, frame; method=method)
         ss_content[iframe] = count(f, ss) / max(1,length(ss))
     end
@@ -78,7 +78,7 @@ function ss_map(
 ) where {F<:Function}
     atom_indices = [atom.index for atom in atoms]
     ss_map = zeros(Int,length(PDBTools.eachresidue(atoms)), length(trajectory))
-    for (iframe, frame) in enumerate(trajectory)
+    @showprogress for (iframe, frame) in enumerate(trajectory)
         ss = ss_frame!(atoms, atom_indices, frame; method=method)
         for (i, ssdata) in pairs(ss)
             ss_map[i,iframe] = ssenum[ssdata.sscode]
