@@ -10,9 +10,9 @@ export SSData
 export stride_run
 export dssp_run 
 
-export is_helix, is_alphahelix, is_pihelix, is_310helix 
+export is_helix, is_alphahelix, is_pihelix, is_310helix, is_kappahelix
 export is_strand, is_betastrand, is_betabridge
-export is_bend, is_coil, is_turn
+export is_bend, is_coil, is_turn, is_loop
 export class
 export ss_composition
 export ss_content
@@ -31,11 +31,12 @@ import Base: @kwdef # for 1.6 compatibility
     alpha::Float64 = 0.0 # dssp only
 end
 
+# Constructor for SSData from residue data only 
 function SSData(resname::String, chain::String, resnum::Int)
     return SSData(resname, chain, resnum, " ", 0.0, 0.0, 0.0, 0.0, 0.0)
 end
 
-
+# Check if two residues are the same given the SSData fields
 function residue_match(ss1::SSData, ss2::SSData)
     return ss1.resname == ss2.resname && ss1.chain == ss2.chain && ss1.resnum == ss2.resnum
 end
