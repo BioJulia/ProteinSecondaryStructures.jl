@@ -100,7 +100,7 @@ The secondary structure classes are:
 | `"310 helix"`       | `"G"`        | `1`          | 
 | `"alpha helix"`     | `"H"`        | `2`          |
 | `"pi helix"`        | `"I"`        | `3`          |
-| `"kappa helix"`       | `"P"`        | `4`          |
+| `"kappa helix"`     | `"P"`        | `4`          |
 | `"turn"`            | `"T"`        | `5`          |
 | `"beta strand"`     | `"E"`        | `6`          |
 | `"beta bridge"`     | `"B"`        | `7`          |
