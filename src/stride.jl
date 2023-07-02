@@ -27,9 +27,9 @@ function stride_pdb_header()
 end
 
 function stride_run(pdb_file::String; fix_header=true)
+    atoms = PDBTools.readPDB(pdb_file, "protein")
     # If the header is not in the correct format, stride will fail
     if fix_header
-        atoms = PDBTools.readPDB(pdb_file, "protein")
         tmp_file = tempname()*".pdb"
         PDBTools.writePDB(atoms, tmp_file; header=stride_pdb_header())
     else
@@ -39,26 +39,28 @@ function stride_run(pdb_file::String; fix_header=true)
     stride_raw_data = try 
         readchomp(pipeline(`$stride_executable $tmp_file`))
     catch
-        println("WARNING: stride failed for file $tmp_file, returning empty secondary structure vector.")
-        atoms = PDBTools.readPDB(pdb_file, "protein")
-        return [ SSData(r.resname, r.chain, r.residue, r.resnum, " ", 0.0, 0.0, 0.0, 0.0, 0.0) for r in atoms ]
     end
-    ssvector = SSData[]
+    ssvector = [ 
+        SSData(r.resname, r.chain, r.residue, r.resnum, " ", 0.0, 0.0, 0.0, 0.0, 0.0) 
+        for r in PDBTools.eachresidue(atoms) 
+    ]
     for line in split(stride_raw_data, "\n")
         if startswith(line, "ASG")
             residue_data = split(line)
-            push!(ssvector,
-                SSData(
-                    resname = residue_data[2],
-                    chain = residue_data[3],
-                    residue = parse(Int, residue_data[4]),
-                    resnum = parse(Int, residue_data[5]),
-                    sscode = residue_data[6],
-                    phi = parse(Float64, residue_data[8]),
-                    psi = parse(Float64, residue_data[9]),
-                    area = parse(Float64, residue_data[10])
-                )
+            ss_residue = SSData(
+                resname = residue_data[2],
+                chain = residue_data[3],
+                resnum = parse(Int, residue_data[4]),
+                residue = parse(Int, residue_data[5]),
+                sscode = residue_data[6],
+                phi = parse(Float64, residue_data[8]),
+                psi = parse(Float64, residue_data[9]),
+                area = parse(Float64, residue_data[10])
             )
+            iss = findfirst(ss -> residue_match(ss_residue, ss), ssvector)
+            if !isnothing(iss)
+                ssvector[iss] = ss_residue
+            end
         end
     end
     return ssvector
