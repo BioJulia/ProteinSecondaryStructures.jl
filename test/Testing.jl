@@ -34,7 +34,7 @@ module Testing
         ExampleData(
             joinpath(data_dir, "pdb", "pdb2btm.pdb"),
             Dict(
-                :stride => Dict("bend" => 0, "kapa helix" => 0, "beta strand" => 75, "strand" => 79, "loop" => 0, "310 helix" => 18, "turn" => 77, "helix" => 251, "beta bridge" => 4, "alpha helix" => 233, "pi helix" => 0, "coil" => 93), 
+                :stride => Dict("bend" => 0, "kapa helix" => 0, "beta strand" => 75, "strand" => 79, "loop" => 2, "310 helix" => 18, "turn" => 77, "helix" => 251, "beta bridge" => 4, "alpha helix" => 233, "pi helix" => 0, "coil" => 93), 
                 :dssp => Dict("bend" => 43, "kapa helix" => 11, "beta strand" => 77, "strand" => 81, "loop" => 80, "310 helix" => 18, "turn" => 54, "helix" => 242, "beta bridge" => 4, "alpha helix" => 213, "pi helix" => 0, "coil" => 0),
             )
         ),
