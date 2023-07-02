@@ -46,10 +46,7 @@ function dssp_run(atoms::AbstractVector{<:PDBTools.Atom}; fix_header=true)
     dssp_raw_data = try 
         readchomp(pipeline(`$dssp_executable --output-format dssp $tmp_file`))
     catch end
-    ssvector = [ 
-        SSData(r.resname, r.chain, r.resnum, " ", 0.0, 0.0, 0.0, 0.0, 0.0) 
-        for r in PDBTools.eachresidue(atoms) 
-    ]
+    ssvector = [ SSData(r.resname, r.chain, r.resnum) for r in PDBTools.eachresidue(atoms) ]
     data_begin = false
     for line in split(dssp_raw_data, "\n")
         if line == dssp_init_line

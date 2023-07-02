@@ -39,10 +39,7 @@ function stride_run(atoms::AbstractVector{<:PDBTools.Atom}; fix_header=true)
         readchomp(pipeline(`$stride_executable $tmp_file`))
     catch
     end
-    ssvector = [ 
-        SSData(r.resname, r.chain, r.resnum, " ", 0.0, 0.0, 0.0, 0.0, 0.0) 
-        for r in PDBTools.eachresidue(atoms) 
-    ]
+    ssvector = [ SSData(r.resname, r.chain, r.resnum) for r in PDBTools.eachresidue(atoms) ]
     for line in split(stride_raw_data, "\n")
         if startswith(line, "ASG")
             residue_data = split(line)

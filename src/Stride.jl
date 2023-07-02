@@ -31,6 +31,11 @@ import Base: @kwdef # for 1.6 compatibility
     alpha::Float64 = 0.0 # dssp only
 end
 
+function SSData(resname::String, chain::String, resnum::Int)
+    return SSData(resname, chain, resnum, " ", 0.0, 0.0, 0.0, 0.0, 0.0)
+end
+
+
 function residue_match(ss1::SSData, ss2::SSData)
     return ss1.resname == ss2.resname && ss1.chain == ss2.chain && ss1.resnum == ss2.resnum
 end
