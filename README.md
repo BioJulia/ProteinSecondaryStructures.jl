@@ -1,6 +1,6 @@
 # Stride.jl
 
-This package parses the [STRIDE](https://en.wikipedia.org/wiki/STRIDE_(algorithm)) and [DSSP](https://github.com/PDB-REDO/dssp) secondary structure prediction outputs, to make them convenient to use from Julia, particularly for the analysis of MD simulations. 
+This package parses [STRIDE](https://en.wikipedia.org/wiki/STRIDE_(algorithm)) and [DSSP](https://github.com/PDB-REDO/dssp) secondary structure prediction outputs, to make them convenient to use from Julia, particularly for the analysis of MD simulations. 
 
 1. [Installation](#installation)
 2. [Usage](#usage)
