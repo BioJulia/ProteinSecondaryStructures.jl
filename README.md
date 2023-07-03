@@ -1,6 +1,7 @@
-# Stride.jl
+# ProteinSecondaryStructures.jl
 
-This package parses [STRIDE](https://en.wikipedia.org/wiki/STRIDE_(algorithm)) and [DSSP](https://github.com/PDB-REDO/dssp) secondary structure prediction outputs, to make them convenient to use from Julia, particularly for the analysis of MD simulations. 
+This package parses [STRIDE]( http://webclu.bio.wzw.tum.de/stride/) and [DSSP](https://github.com/PDB-REDO/dssp) secondary structure prediction outputs, to make them convenient to use from Julia, particularly for the analysis of MD simulations. 
+ 
 
 1. [Installation](#installation)
 2. [Usage](#usage)
@@ -21,7 +22,7 @@ Obtain `stride` and/or `dssp` programs from the corresponding repositories, comp
 For `stride`:
 
 ```bash
-git clone https://github.com/MDAnalysis/stride
+git clone https://github.com/m3g/stride
 cd stride/src
 make
 cp ./stride /usr/local/bin # or somewhere in the path
@@ -35,10 +36,10 @@ sudo apt install dssp # on Ubuntu-based linux distributions
 
 or go to: https://github.com/PDB-REDO/dssp
 
-In Julia, install `Stride` with:
+In Julia, install `ProteinSecondaryStructures` with:
 
 ```julia
-import Pkg; Pkg.add(url="https://github.com/m3g/Stride.jl")
+import Pkg; Pkg.add(url="https://github.com/m3g/ProteinSecondaryStructures.jl")
 ```
 
 ## Usage
@@ -46,10 +47,10 @@ import Pkg; Pkg.add(url="https://github.com/m3g/Stride.jl")
 ### Computing the secondary structure from a PDB file
 
 ```julia
-julia> using Stride
+julia> using ProteinSecondaryStructures
 
-julia> pdbfile = Stride.Testing.examples[1].filename
-"/home/user/.julia/dev/Stride/test/data/pdb/pdb1fmc.pdb"
+julia> pdbfile = ProteinSecondaryStructures.Testing.examples[1].filename
+"/home/user/.julia/dev/ProteinSecondaryStructures/test/data/pdb/pdb1fmc.pdb"
 
 julia> ss = stride_run(pdbfile)
 510-element Vector{SSData}:
@@ -71,10 +72,10 @@ import Pkg; Pkg.add("PDBTools")
 Then:
 
 ```julia
-julia> using Stride, PDBTools
+julia> using ProteinSecondaryStructures, PDBTools
 
-julia> pdbfile = Stride.Testing.examples[1].filename
-"/home/user/.julia/dev/Stride/test/data/pdb/pdb1fmc.pdb"
+julia> pdbfile = ProteinSecondaryStructures.Testing.examples[1].filename
+"/home/user/.julia/dev/ProteinSecondaryStructures/test/data/pdb/pdb1fmc.pdb"
 
 julia> pdb = readPDB(pdbfile, "protein and chain A") # read only protein atoms from chain A
    Array{Atoms,1} with 1876 atoms with fields:
@@ -201,15 +202,15 @@ is_coil
 ### Computing the secondary structure map
 
 ```julia
-using Stride
-import PDBTools
-import Chemfiles
+using ProteinSecondaryStructures 
+using PDBTools: readPDB 
+using Chemfiles: Trajectory
 
-pdbfile = Stride.Testing.data_dir*"/Gromacs/system.pdb"
-trajectory_file = Stride.Testing.data_dir*"/Gromacs/trajectory.xtc"
+pdbfile = ProteinSecondaryStructures.Testing.data_dir*"/Gromacs/system.pdb"
+trajectory_file = ProteinSecondaryStructures.Testing.data_dir*"/Gromacs/trajectory.xtc"
 
-atoms = PDBTools.readPDB(pdbfile, "protein")
-trajectory = Chemfiles.Trajectory(trajectory_file)
+atoms = readPDB(pdbfile, "protein")
+trajectory = Trajectory(trajectory_file)
 
 ssmap = ss_map(atoms, trajectory) # returns a matrix
 ```
@@ -272,15 +273,15 @@ trajectory (the map) can be costly.
 #### For a single class, along the trajectory
 
 ```julia
-using Stride
-import PDBTools
-import Chemfiles
+using ProteinSecondaryStructures 
+using PDBTools: readPDB 
+using Chemfiles: Trajectory
 
-pdbfile = Stride.Testing.data_dir*"/Gromacs/system.pdb"
-trajectory_file = Stride.Testing.data_dir*"/Gromacs/trajectory.xtc"
+pdbfile = ProteinSecondaryStructures.Testing.data_dir*"/Gromacs/system.pdb"
+trajectory_file = ProteinSecondaryStructures.Testing.data_dir*"/Gromacs/trajectory.xtc"
 
-atoms = PDBTools.readPDB(pdbfile, "protein")
-trajectory = Chemfiles.Trajectory(trajectory_file)
+atoms = readPDB(pdbfile, "protein")
+trajectory = Trajectory(trajectory_file)
 
 helical_content = ss_content(is_helix, atoms, trajectory)
 ```

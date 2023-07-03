@@ -12,7 +12,7 @@ stride_executable = "stride"
 Run stride on the pdb file and return a vector containing the `stride` detailed
 secondary structure information for each residue.
 
-The `stride` executable must be in the path or, alternatively, the `Stride.stride_executable`
+The `stride` executable must be in the path or, alternatively, the `ProteinSecondaryStructures.stride_executable`
 variable can be set to the full path of the executable.
 
 """

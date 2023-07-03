@@ -1,4 +1,4 @@
-module Stride
+module ProteinSecondaryStructures
 
 using TestItems
 using ProgressMeter
@@ -26,9 +26,9 @@ import Base: @kwdef # for 1.6 compatibility
     sscode::String
     phi::Float64
     psi::Float64
-    area::Float64 = 0.0 # stride only
-    kappa::Float64 = 0.0 # dssp only
-    alpha::Float64 = 0.0 # dssp only
+    area::Float64 = 0.0 # stride specific
+    kappa::Float64 = 0.0 # dssp specific
+    alpha::Float64 = 0.0 # dssp specific
 end
 
 # Constructor for SSData from residue data only 
@@ -157,5 +157,5 @@ include("./trajectories.jl")
 # Testing module
 include("../test/Testing.jl")
 
-end # module Stride
+end # module ProteinSecondaryStructures
 

@@ -43,7 +43,7 @@ function ss_map(
 end
 
 @testitem "ss_map" begin
-    using Stride.Testing
+    using ProteinSecondaryStructures.Testing
     import PDBTools
     import Chemfiles
     pdbfile = joinpath(Testing.data_dir,"Gromacs","system.pdb")
@@ -116,7 +116,7 @@ function ss_content(
 end
 
 @testitem "ss_content" begin
-    using Stride.Testing
+    using ProteinSecondaryStructures.Testing
     using PDBTools: readPDB
     using Chemfiles: Trajectory
     pdbfile = joinpath(Testing.data_dir,"Gromacs","system.pdb")

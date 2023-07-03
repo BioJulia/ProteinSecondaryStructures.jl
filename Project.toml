@@ -1,4 +1,4 @@
-name = "Stride"
+name = "ProteinSecondaryStructures"
 uuid = "c298f58b-271f-48cb-96ac-5442ca7c67d9"
 authors = ["Leandro Martinez <lmartine@unicamp.br> and contributors"]
 version = "0.1.0-DEV"

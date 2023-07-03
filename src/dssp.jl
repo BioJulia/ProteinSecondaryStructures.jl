@@ -12,7 +12,7 @@ dssp_executable = "dssp"
 Run DSSP on the pdb file and return a vector containing the detailed
 secondary structure information for each residue.
 
-The `dssp` executable must be in the path or, alternatively, the `Stride.dssp_executable`
+The `dssp` executable must be in the path or, alternatively, the `ProteinSecondaryStructures.dssp_executable`
 variable can be set to the full path of the executable.
 
 """
