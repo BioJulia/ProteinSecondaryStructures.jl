@@ -1,0 +1,161 @@
+module ProteinSecondaryStructures
+
+using TestItems
+using ProgressMeter
+import Chemfiles
+import PDBTools
+
+export SSData
+
+export stride_run
+export dssp_run 
+
+export is_helix, is_alphahelix, is_pihelix, is_310helix, is_kappahelix
+export is_strand, is_betastrand, is_betabridge
+export is_bend, is_coil, is_turn, is_loop
+export class
+export ss_composition
+export ss_content
+export ss_map
+
+import Base: @kwdef # for 1.6 compatibility
+@kwdef struct SSData 
+    resname::String
+    chain::String
+    resnum::Int
+    sscode::String
+    phi::Float64
+    psi::Float64
+    area::Float64 = 0.0 # stride specific
+    kappa::Float64 = 0.0 # dssp specific
+    alpha::Float64 = 0.0 # dssp specific
+end
+
+# Constructor for SSData from residue data only 
+function SSData(resname::String, chain::String, resnum::Int)
+    return SSData(resname, chain, resnum, " ", 0.0, 0.0, 0.0, 0.0, 0.0)
+end
+
+# Check if two residues are the same given the SSData fields
+function residue_match(ss1::SSData, ss2::SSData)
+    return ss1.resname == ss2.resname && ss1.chain == ss2.chain && ss1.resnum == ss2.resnum
+end
+
+# Stride interface
+include("./stride.jl")
+
+# DSSP interface
+include("./dssp.jl")
+
+# Common interface 
+const classes = Dict{String,String}(
+    "G" => "310 helix",
+    "H" => "alpha helix",
+    "I" => "pi helix",
+    "P" => "kappa helix",
+    "T" => "turn",
+    "E" => "beta strand",
+    "B" => "beta bridge",
+    "S" => "bend",
+    "C" => "coil",
+    " " => "loop",
+)
+
+const code_to_number = Dict{String,Int}(
+    "G" => 1, # 310 helix
+    "H" => 2, # alpha helix
+    "I" => 3, # pi helix
+    "P" => 4, # kappa helix
+    "T" => 5, # turn
+    "E" => 6, # beta strand
+    "B" => 7, # beta bridge
+    "S" => 8, # bend
+    "C" => 9, # coil
+    " " => 10, # loop
+)
+
+const number_to_code = Dict{Int,String}(
+    code_to_number[key] => key for key in keys(code_to_number)
+)
+
+"""
+    class(ss::Union{SSData, SSData, Int, String})
+
+Return the secondary structure class. The input may be a `SSData` object, 
+a secondary structure `Int` code (1-8) or a secondary structure type string (`G, H, ..., C`).
+
+The secondary structure classes are:
+
+| Secondary structure | `ss code`    | `code number`|
+|:--------------------|:------------:|:------------:|
+| `"310 helix"`       | `"G"`        | `1`          | 
+| `"alpha helix"`     | `"H"`        | `2`          |
+| `"pi helix"`        | `"I"`        | `3`          |
+| `"kappa helix"`     | `"P"`        | `4`          |
+| `"turn"`            | `"T"`        | `5`          |
+| `"beta strand"`     | `"E"`        | `6`          |
+| `"beta bridge"`     | `"B"`        | `7`          |
+| `"bend"`            | `"S"`        | `8`          |
+| `"coil"`            | `"C"`        | `9`          |
+| `"loop"`            | `" "`        | `10`         |
+
+"""
+class(ss::SSData) = classes[ss.sscode]
+class(code_number::Int) = classes[number_to_code[code_number]]
+class(sscode::String) = classes[sscode]
+
+@doc """
+    is_helix(ss::SSData)
+    is_alphahelix(ss::SSData)
+    is_pihelix(ss::SSData)
+    is_kappahelix(ss::SSData)
+    is_310helix(ss::SSData)
+    is_strand(ss::SSData)
+    is_betastrand(ss::SSData)
+    is_betabridge(ss::SSData)
+    is_turn(ss::SSData)
+    is_bend(ss::SSData)
+    is_coil(ss::SSData)
+    is_turn(ss::SSData)
+
+Return `true` if the data is of the given secondary structure type.
+
+"""
+function is_function end
+
+@doc (@doc is_function) is_helix(ss::SSData) = ss.sscode in ("H", "G", "I", "P")
+@doc (@doc is_function) is_alphahelix(ss::SSData) = ss.sscode == "H"
+@doc (@doc is_function) is_pihelix(ss::SSData) = ss.sscode == "I"
+@doc (@doc is_function) is_kappahelix(ss::SSData) = ss.sscode == "P"
+@doc (@doc is_function) is_310helix(ss::SSData) = ss.sscode == "G"
+@doc (@doc is_function) is_strand(ss::SSData) = ss.sscode in ("E", "B")
+@doc (@doc is_function) is_betastrand(ss::SSData) = ss.sscode == "E"
+@doc (@doc is_function) is_betabridge(ss::SSData) = ss.sscode == "B"
+@doc (@doc is_function) is_turn(ss::SSData) = ss.sscode == "T"
+@doc (@doc is_function) is_bend(ss::SSData) = ss.sscode == "S"
+@doc (@doc is_function) is_coil(ss::SSData) = ss.sscode == "C"
+@doc (@doc is_function) is_loop(ss::SSData) = ss.sscode == " "
+
+"""
+    ss_composition(data::AbstractVector{<:SSData})
+
+Calculate the secondary structure composition of the data. Returns a dictionary of
+the secondary structure types and their counts.
+
+"""
+function ss_composition(data::AbstractVector{<:SSData})
+    sscomposition = Dict{String,Int}()
+    for sscode in keys(classes)
+        sscomposition[class(sscode)] = count(ss -> ss.sscode == sscode, data)    
+    end
+    return sscomposition
+end
+
+# Trajectory analysis
+include("./trajectories.jl")
+
+# Testing module
+include("../test/Testing.jl")
+
+end # module ProteinSecondaryStructures
+
