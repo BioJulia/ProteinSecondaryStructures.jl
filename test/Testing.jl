@@ -45,6 +45,13 @@ module Testing
                 :dssp => Dict("310 helix" => 0, "bend" => 0, "turn" => 0, "beta bridge" => 0, "kappa helix" => 0, "pi helix" => 0, "beta strand" => 0, "alpha helix" => 0, "loop" => 1, "coil" => 0),
             )
         ),
+        ExampleData(
+            joinpath(data_dir, "pdb", "stride_b.pdb"),
+            Dict(
+                :stride => Dict("310 helix" => 0, "bend" => 0, "turn" => 2, "beta bridge" => 5, "kappa helix" => 0, "pi helix" => 0, "beta strand" => 0, "alpha helix" => 0, "loop" => 0, "coil" => 8), 
+                :dssp => Dict("310 helix" => 0, "bend" => 3, "turn" => 2, "beta bridge" => 2, "kappa helix" => 3, "pi helix" => 0, "beta strand" => 0, "alpha helix" => 0, "loop" => 5, "coil" => 0), 
+            )
+        ),
     ]
 
 end
