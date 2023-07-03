@@ -225,12 +225,17 @@ This will create a matrix that can be visualized, for instance, with:
 
 ```julia
 using Plots
-heatmap(ssmap,xlabel="step",ylabel="residue")
+heatmap(ssmap,
+  xlabel="frame",
+  ylabel="residue",
+  framestyle=:box,
+  color=palette(:tab20c,10)
+)
 ```
 
 producing the figure:
 
-![heatmap](./test/map.png)
+![heatmap](./test/map.svg)
 
 where the colors refer to the `code number` fields of the [classes table](#classes-of-secondary-structure) above.
 
