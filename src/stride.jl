@@ -45,17 +45,26 @@ function stride_run(atoms::AbstractVector{<:PDBTools.Atom}; fix_header=true)
         "error" 
     end
     ssvector = [ SSData(r.resname, r.chain, r.resnum) for r in PDBTools.eachresidue(atoms) ]
+    #      ASG    Detailed secondary structure assignment
+	#      Format:  6-8  Residue name
+	#	      10-10 Protein chain identifier
+	#	      12-15 PDB	residue	number
+	#	      17-20 Ordinal residue number
+	#	      25-25 One	letter secondary structure code	**)
+	#	      27-39 Full secondary structure name
+	#	      43-49 Phi	angle
+	#	      53-59 Psi	angle
+	#	      65-69 Residue solvent accessible area
     for line in split(stride_raw_data, "\n")
         if startswith(line, "ASG")
-            residue_data = split(line)
             ss_residue = SSData(
-                resname = residue_data[2],
-                chain = residue_data[3],
-                resnum = parse(Int, residue_data[4]),
-                sscode = uppercase(residue_data[6]), # stride sometimes returns "b" instead of "B"
-                phi = parse(Float64, residue_data[8]),
-                psi = parse(Float64, residue_data[9]),
-                area = parse(Float64, residue_data[10])
+                resname = line[6:8],
+                chain = line[10:10],
+                resnum = parse(Int, line[12:15]),
+                sscode = uppercase(line[25:25]), # stride sometimes returns "b" instead of "B"
+                phi = parse(Float64, line[43:49]),
+                psi = parse(Float64, line[53:59]),
+                area = parse(Float64, line[65:69])
             )
             iss = findfirst(ss -> residue_match(ss_residue, ss), ssvector)
             if !isnothing(iss)
