@@ -81,12 +81,12 @@ function ss_content(
     return ss_content
 end
 
-is_helix(sscode::Int) = number_to_code[sscode] in ("H", "G", "I", "P")
+is_anyhelix(sscode::Int) = number_to_code[sscode] in ("H", "G", "I", "P")
 is_alphahelix(sscode::Int) = number_to_code[sscode] == "H"
 is_pihelix(sscode::Int) = number_to_code[sscode] == "I"
 is_kappahelix(sscode::Int) = number_to_code[sscode] == "P"
 is_310helix(sscode::Int) = number_to_code[sscode] == "G"
-is_strand(sscode::Int) = number_to_code[sscode] in ("E", "B")
+is_anystrand(sscode::Int) = number_to_code[sscode] in ("E", "B")
 is_betastrand(sscode::Int) = number_to_code[sscode] == "E"
 is_betabridge(sscode::Int) = number_to_code[sscode] == "B"
 is_turn(sscode::Int) = number_to_code[sscode] == "T"
@@ -122,21 +122,21 @@ end
     pdbfile = joinpath(Testing.data_dir,"Gromacs","system.pdb")
     trajectory = Trajectory(joinpath(Testing.data_dir,"Gromacs","trajectory.xtc"))
     # With stride
-    helical_content = ss_content(is_helix, readPDB(pdbfile, "protein"), trajectory; method=stride_run)
+    helical_content = ss_content(is_anyhelix, readPDB(pdbfile, "protein"), trajectory; method=stride_run)
     @test length(helical_content) == 26
     @test sum(helical_content)/length(helical_content) ≈ 0.2181174089068826
     # With DSSP
-    helical_content = ss_content(is_helix, readPDB(pdbfile, "protein"), trajectory; method=dssp_run)
+    helical_content = ss_content(is_anyhelix, readPDB(pdbfile, "protein"), trajectory; method=dssp_run)
     @test length(helical_content) == 26
     @test sum(helical_content)/length(helical_content) ≈ 0.21103238866396762
     # With non-contiguous indexing
     atoms = readPDB(pdbfile, only = at -> (10 <= at.residue < 30) | (40 <= at.residue < 60))
-    helical_content = ss_content(is_helix, atoms, trajectory; method=stride_run)
+    helical_content = ss_content(is_anyhelix, atoms, trajectory; method=stride_run)
     @test length(helical_content) == 26
     @test sum(helical_content)/length(helical_content) ≈ 0.20288461538461539
     # From the map
     ssmap = ss_map(readPDB(pdbfile, "protein"), trajectory; method=stride_run)
-    helical_content = ss_content(is_helix, ssmap)
+    helical_content = ss_content(is_anyhelix, ssmap)
     @test length(helical_content) == 26
     @test sum(helical_content)/length(helical_content) ≈ 0.2181174089068826
 end

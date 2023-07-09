@@ -167,10 +167,10 @@ julia> class(ss[10])
 And helper functions are available to obtain boolean vectors to check if each residue belong to some class. For example:
 
 ```julia
-julia> is_helix(ss[10])
+julia> is_anyhelix(ss[10])
 false
 
-julia> is_helix.(ss)
+julia> is_anyhelix.(ss)
 255-element BitVector:
  0
  0
@@ -186,12 +186,12 @@ where in the last example we used the broadcast operation (the dot) to obtain th
 
 The following functions are available:
 ```julia
-is_helix
+is_anyhelix
 is_alphahelix
 is_pihelix
 is_310helix
 is_kappahelix
-is_strand
+is_anystrand
 is_betastrand
 is_betabridge
 is_turn
@@ -288,15 +288,15 @@ trajectory_file = ProteinSecondaryStructures.Testing.data_dir*"/Gromacs/trajecto
 atoms = readPDB(pdbfile, "protein")
 trajectory = Trajectory(trajectory_file)
 
-helical_content = ss_content(is_helix, atoms, trajectory)
+helical_content = ss_content(is_anyhelix, atoms, trajectory)
 ```
 
 Optionally, the method to compute the secondary structure can be defined, with, for example: 
 
 ```julia
-helical_content = ss_content(is_helix, atoms, trajectory; method=stride_run)
+helical_content = ss_content(is_anyhelix, atoms, trajectory; method=stride_run)
 #or
-helical_content = ss_content(is_helix, atoms, trajectory; method=dssp_run)
+helical_content = ss_content(is_anyhelix, atoms, trajectory; method=dssp_run)
 ```
 
 ## Note
