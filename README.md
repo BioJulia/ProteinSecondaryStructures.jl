@@ -62,6 +62,12 @@ julia> ss = stride_run(pdbfile)
 
 or use `dssp_run` to use the `dssp` method.
 
+!!! note
+    By default, only atoms of standard protein residues will be considered from the PDB file. It 
+    is possible to select different subsets of atoms with the `selection` keyword, but then `STRIDE`
+    or `DSSP` may fail with internal errors if the residue or atom types are not recognized. 
+    The `selection` keyword follows the [PDBTools.jl selection syntax](https://m3g.github.io/PDBTools.jl/stable/selections/).
+
 ### Computing from a selection of atoms using PDBTools
 
 Install `PDBTools` with:
