@@ -6,7 +6,7 @@
 stride_executable = "stride"
 
 """
-    stride_run(pdb_file::String)
+    stride_run(pdb_file::String; selection="protein")
     stride_run(atoms::AbstractVector{<:PDBTools.Atom})
 
 Run stride on the pdb file and return a vector containing the `stride` detailed
@@ -14,6 +14,10 @@ secondary structure information for each residue.
 
 The `stride` executable must be in the path or, alternatively, the `ProteinSecondaryStructures.stride_executable`
 variable can be set to the full path of the executable.
+
+When passing a PDB file, by default only the atoms belonging to standard protein residues are considered. This can be changed by
+setting the `selection` keyword argument to a different selection string, or function, following the `PDBTools.jl` syntax.
+Note that `STRIDE` will fail if residue or atoms types not recognized. 
 
 """
 function stride_run end
@@ -64,8 +68,8 @@ function stride_run(atoms::AbstractVector{<:PDBTools.Atom}; fix_header=true)
 end
 
 # From a PDB file
-function stride_run(pdb_file::String; fix_header=true) 
-    atoms = PDBTools.readPDB(pdb_file, "protein")
+function stride_run(pdb_file::String; selection="protein", fix_header=true) 
+    atoms = PDBTools.readPDB(pdb_file, selection)
     return stride_run(atoms; fix_header=fix_header)
 end
 

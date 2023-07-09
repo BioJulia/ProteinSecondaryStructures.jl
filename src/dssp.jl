@@ -6,7 +6,7 @@
 dssp_executable = "dssp"
 
 """
-    dssp_run(pdb_file::String)
+    dssp_run(pdb_file::String; selection="protein")
     dssp_run(atoms::AbstractVector{<:PDBTools.Atom})
 
 Run DSSP on the pdb file and return a vector containing the detailed
@@ -14,6 +14,10 @@ secondary structure information for each residue.
 
 The `dssp` executable must be in the path or, alternatively, the `ProteinSecondaryStructures.dssp_executable`
 variable can be set to the full path of the executable.
+
+When passing a PDB file, by default only the atoms belonging to standard protein residues are considered. This can be changed by
+setting the `selection` keyword argument to a different selection string, or function, following the `PDBTools.jl` syntax.
+Note that `DSSP` will fail if residue or atoms types not recognized. 
 
 """
 function dssp_run end
@@ -79,8 +83,8 @@ function dssp_run(atoms::AbstractVector{<:PDBTools.Atom}; fix_header=true)
 end
 
 # From the PDB file
-function dssp_run(pdb_file::String; fix_header=true)
-    atoms = PDBTools.readPDB(pdb_file, "protein")
+function dssp_run(pdb_file::String; selection="protein", fix_header=true)
+    atoms = PDBTools.readPDB(pdb_file, selection)
     return dssp_run(atoms; fix_header=fix_header)
 end
 
