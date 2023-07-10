@@ -245,6 +245,19 @@ producing the figure:
 
 where the colors refer to the `code number` fields of the [classes table](#classes-of-secondary-structure) above.
 
+#### Saving and loading a secondary structure map
+
+The secondary structure map computed is just a matrix of integer codes. Thus, it can be saved or read in any preferred format.
+As a suggestion, it is possible to use `writedlm` and `readdlm` function from the `DelimitedFiles` package: 
+
+```julia
+usign DelimitedFiles
+# save data to ssmap.dat
+writedlm("ssmap.dat", ssmap)
+# load data
+ssmat = readdlm("ssmap.dat", Int)
+```
+
 ### Computing the ammount of secondary structure classes in a trajectory 
 
 #### From the secondary structure map
