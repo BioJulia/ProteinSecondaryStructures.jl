@@ -251,7 +251,7 @@ The secondary structure map computed is just a matrix of integer codes. Thus, it
 As a suggestion, it is possible to use `writedlm` and `readdlm` function from the `DelimitedFiles` package: 
 
 ```julia
-usign DelimitedFiles
+using DelimitedFiles
 # save data to ssmap.dat
 writedlm("ssmap.dat", ssmap)
 # load data
