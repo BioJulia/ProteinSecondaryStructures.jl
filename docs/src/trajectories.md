@@ -116,7 +116,7 @@ trajectory (the map) can be costly.
 ### Single class, througout the trajectory
 
 If the user wants to compute the content of a single class of secondary structures
-along a trajectory, that can be done without precomputing the secondary structure map.
+along a trajectory, that can be done without precomputing the secondary structure map
 (note, however, that the cost is similar).
 
 For example, in the following script we compute the content of $\alpha$-helices of the
@@ -136,7 +136,7 @@ trajectory = Trajectory(trajectory_file)
 helical_content = ss_content(is_alphahelix, atoms, trajectory)
 ```
 
-The method to compute the secondary structure can be defined again with the `method`
+The method to compute the secondary structure can be defined with the `method`
 keyword: 
 
 ```julia
@@ -166,11 +166,11 @@ function from `PDBTools` and the plotting features of `Plots`. THe complete scri
 
 ```julia
 using Plots, PDBTools
-Plots.default(fontfamily="Computer Modern",linewidth=1,framestyle=:box)
+Plots.default(fontfamily="Computer Modern",linewidth=2,framestyle=:box)
 plt = plot(layout=(2,1))
 ahelix = ss_content(is_alphahelix, ssmap)
 plot!(plt, subplot=1, 
-    ahelix, label=nothing, linewidth=2,
+    ahelix, label=nothing,
     xlabel="simulation frame", 
     ylabel="α-helical content"
  )
@@ -183,7 +183,7 @@ xticks=(residue_indexes[begin:5:end],xlabels[begin:5:end])
 plot!(plt, subplot=2,
     residue_indexes, 
     ahelix_avg, 
-    label=nothing, linewidth=2, 
+    label=nothing,
     xlabel="Residue",
     ylabel="α-helical content",
     xticks=xticks, xrotation=60
@@ -199,7 +199,7 @@ parameters for `Plots` for prettier output.
 ```julia-repl
 julia> using Plots, PDBTools
 
-julia> Plots.default(fontfamily="Computer Modern",linewidth=1,framestyle=:box)
+julia> Plots.default(fontfamily="Computer Modern",linewidth=2,framestyle=:box)
 ```
 
 We then initialize a plot with two pannels. The upper supblot will contain the
@@ -283,7 +283,7 @@ julia> plot!(plt, subplot=2,
            xlabel="Residue",
            ylabel="α-helical content",
            xticks=(residue_indexes[begin:5:end], xlabels[begin:5:end]),
-           xrotation=60, linewidth=2,
+           xrotation=60,
        )
 
 julia> savefig("./helical_content.svg")
