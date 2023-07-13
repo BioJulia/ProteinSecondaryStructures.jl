@@ -45,18 +45,29 @@ from trajectory runs.
 
 The output of the secondary structure calculations is a vector of `SSData` elements, with the following data, for each residue:
 
-```julia
-struct SSData
-    resname::String
-    chain::String
-    resnum::Int
-    sscode::String
-    phi::Float64
-    psi::Float64
-    area::Float64 = 0.0 # stride only
-    kappa::Float64 = 0.0 # dssp only
-    alpha::Float64 = 0.0 # dssp only
-end
+```@docs
+SSData
+```
+
+The output of `stride_run` or `dssp_run` is a vector of `SSData` structures, one for each residue. For example: 
+
+```julia-repl
+julia> using ProteinSecondaryStructures
+
+# Replace the next assignment with a custom PDB file name
+julia> pdbfile = ProteinSecondaryStructures.Testing.examples[1].filename
+"/home/user/.julia/dev/ProteinSecondaryStructures/test/data/pdb/pdb1fmc.pdb"
+
+julia> ss = stride_run(pdbfile);
+
+julia> ss[1]
+SSData("MET", "A", 1, "C", 360.0, 150.62, 234.4, 0.0, 0.0)
+
+julia> ss[1].sscode
+"C"
+
+julia> class(ss[1].sscode)
+"coil"
 ```
 
 

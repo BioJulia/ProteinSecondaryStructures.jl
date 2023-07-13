@@ -7,7 +7,7 @@ This package parses [STRIDE]( http://webclu.bio.wzw.tum.de/stride/) and [DSSP](h
 In Julia, install `ProteinSecondaryStructures` with:
 
 ```julia-repl
-julia> import Pkg; Pkg.add("ProteinSecondaryStructure")
+julia> import Pkg; Pkg.add("ProteinSecondaryStructures")
 ```
 
 There is no need to independently install STRIDE or DSSP.
