@@ -35,7 +35,7 @@ the DSSP convention, described in [Secondary structure classes](@ref).
 
 The details of the `SSData` structure that contain the output for each residue are described in the [Data structure](@ref) section.
 
-## Single PDB: composition
+## Secondary structure composition
 
 Given the `ss` output of the `stride_run` or `dssp_run` functions, an overview of content of the secondary structure can be obtained with the
 `ss_composition` function:
