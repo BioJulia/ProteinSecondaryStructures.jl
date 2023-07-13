@@ -21,10 +21,14 @@ function ss_frame!(
 end
 
 """
+    ss_map(pdbfile::AbstractString, trajectory::Chemfiles.Trajectory; selection="protein")
     ss_map(atoms::AbstractVector{<:PDBTools.Atom}, trajectory::Chemfiles.Trajectory)
 
 Calculate the secondary structure map of the trajectory. 
 Returns a matrix of secondary structure codes, where each row is a residue and each column is a frame.
+
+The atoms to be considered may be provided directly with an `atoms` vector, or by reading a PDB file,
+in which case the `selection` keyword argument is used to select the atoms to be considered.
 
 """
 function ss_map(
@@ -43,6 +47,16 @@ function ss_map(
     return ss_map
 end
 
+function ss_map(
+    pdbfile::AbstractString,
+    trajectory::Chemfiles.Trajectory;
+    method::F=stride_run,
+    selection::AbstractString="protein"
+) where {F<:Function}
+    atoms = PDBTools.readPDB(pdbfile, selection)
+    return ss_map(atoms, trajectory; method=method)
+end
+
 @testitem "ss_map" begin
     using ProteinSecondaryStructures.Testing
     import PDBTools
@@ -57,6 +71,10 @@ end
     ssmap = ss_map(PDBTools.readPDB(pdbfile, "protein"), trajectory; method=dssp_run)
     @test size(ssmap) == (76, 26)
     @test sum(ssmap) == 12069
+    # From the pdb file name
+    ssmap = ss_map(pdbfile, trajectory; method=stride_run, selection="protein")
+    @test size(ssmap) == (76, 26)
+    @test sum(ssmap) == 10577
 end
 
 """
