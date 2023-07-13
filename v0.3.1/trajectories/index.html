@@ -36,7 +36,7 @@ Dict{String, Int64} with 10 entries:
   &quot;alpha helix&quot; =&gt; 12
   &quot;pi helix&quot;    =&gt; 0
   &quot;loop&quot;        =&gt; 0
-  &quot;coil&quot;        =&gt; 13</code></pre><p>These functions are useful, because the computation of the secondary structure along the trajectory (the map) can be costly.</p><h3 id="Single-class,-througout-the-trajectory"><a class="docs-heading-anchor" href="#Single-class,-througout-the-trajectory">Single class, througout the trajectory</a><a id="Single-class,-througout-the-trajectory-1"></a><a class="docs-heading-anchor-permalink" href="#Single-class,-througout-the-trajectory" title="Permalink"></a></h3><p>If the user wants to compute the content of a single class of secondary structures along a trajectory, that can be done without precomputing the secondary structure map. (note, however, that the cost is similar).</p><p>For example, in the following script we compute the content of <span>$\alpha$</span>-helices of the structure along the trajectory:</p><pre><code class="language-julia hljs">using ProteinSecondaryStructures 
+  &quot;coil&quot;        =&gt; 13</code></pre><p>These functions are useful, because the computation of the secondary structure along the trajectory (the map) can be costly.</p><h3 id="Single-class,-througout-the-trajectory"><a class="docs-heading-anchor" href="#Single-class,-througout-the-trajectory">Single class, througout the trajectory</a><a id="Single-class,-througout-the-trajectory-1"></a><a class="docs-heading-anchor-permalink" href="#Single-class,-througout-the-trajectory" title="Permalink"></a></h3><p>If the user wants to compute the content of a single class of secondary structures along a trajectory, that can be done without precomputing the secondary structure map (note, however, that the cost is similar).</p><p>For example, in the following script we compute the content of <span>$\alpha$</span>-helices of the structure along the trajectory:</p><pre><code class="language-julia hljs">using ProteinSecondaryStructures 
 using PDBTools: readPDB 
 using Chemfiles: Trajectory
 
@@ -46,14 +46,14 @@ trajectory_file = ProteinSecondaryStructures.Testing.data_dir*&quot;/Gromacs/tra
 atoms = readPDB(pdbfile, &quot;protein&quot;)
 trajectory = Trajectory(trajectory_file)
 
-helical_content = ss_content(is_alphahelix, atoms, trajectory)</code></pre><p>The method to compute the secondary structure can be defined again with the <code>method</code> keyword: </p><pre><code class="language-julia hljs">helical_content = ss_content(is_alphahelix, atoms, trajectory; method=stride_run)
+helical_content = ss_content(is_alphahelix, atoms, trajectory)</code></pre><p>The method to compute the secondary structure can be defined with the <code>method</code> keyword: </p><pre><code class="language-julia hljs">helical_content = ss_content(is_alphahelix, atoms, trajectory; method=stride_run)
 #or
 helical_content = ss_content(is_alphahelix, atoms, trajectory; method=dssp_run)</code></pre><h2 id="Average-structure-per-residue"><a class="docs-heading-anchor" href="#Average-structure-per-residue">Average structure per residue</a><a id="Average-structure-per-residue-1"></a><a class="docs-heading-anchor-permalink" href="#Average-structure-per-residue" title="Permalink"></a></h2><p>Here we provide a example where we use some features of <code>PDBTools.jl</code> and <code>Plots</code> to illustrate the average content of <span>$\alpha$</span>-helices for each residue of the protein, along the simulation. </p><p>Here, we assume that a secondary structure map, <code>ssmap</code>, was computed using the instructions above.</p><p>The goal is to obtain a figure similar to this one, in which in the upper pannel we show the evolution of the total <span>$\alpha$</span>-helical content as a function of the simulation frames, and in the lower pannel we show the content of helices of each residue, with appropriate indexing. </p><p><img src="../assets/helical_content.svg" alt="helical content"/></p><p>The script to produce the figure above is a manipulation of the <code>ssmap</code> output, using function from <code>PDBTools</code> and the plotting features of <code>Plots</code>. THe complete script is:</p><pre><code class="language-julia hljs">using Plots, PDBTools
-Plots.default(fontfamily=&quot;Computer Modern&quot;,linewidth=1,framestyle=:box)
+Plots.default(fontfamily=&quot;Computer Modern&quot;,linewidth=2,framestyle=:box)
 plt = plot(layout=(2,1))
 ahelix = ss_content(is_alphahelix, ssmap)
 plot!(plt, subplot=1, 
-    ahelix, label=nothing, linewidth=2,
+    ahelix, label=nothing,
     xlabel=&quot;simulation frame&quot;, 
     ylabel=&quot;α-helical content&quot;
  )
@@ -66,14 +66,14 @@ xticks=(residue_indexes[begin:5:end],xlabels[begin:5:end])
 plot!(plt, subplot=2,
     residue_indexes, 
     ahelix_avg, 
-    label=nothing, linewidth=2, 
+    label=nothing,
     xlabel=&quot;Residue&quot;,
     ylabel=&quot;α-helical content&quot;,
     xticks=xticks, xrotation=60
 )
 savefig(&quot;./helical_content.svg&quot;)</code></pre><h4 id="Step-by-step-construction-of-the-figure"><a class="docs-heading-anchor" href="#Step-by-step-construction-of-the-figure">Step-by-step construction of the figure</a><a id="Step-by-step-construction-of-the-figure-1"></a><a class="docs-heading-anchor-permalink" href="#Step-by-step-construction-of-the-figure" title="Permalink"></a></h4><p>First, we load the <code>Plots</code> and <code>PDBTools</code> packages, and set some default parameters for <code>Plots</code> for prettier output.</p><pre><code class="language-julia-repl hljs">julia&gt; using Plots, PDBTools
 
-julia&gt; Plots.default(fontfamily=&quot;Computer Modern&quot;,linewidth=1,framestyle=:box)</code></pre><p>We then initialize a plot with two pannels. The upper supblot will contain the <span>$\alpha$</span>-helical content as a function simulation frames, and the lower subplot will contain the average content of helices for each residue.</p><pre><code class="language-julia-repl hljs">julia&gt; plt = plot(layout=(2,1))</code></pre><p>Next, we compute, from the secondary structure map, the <span>$\alpha$</span>-helical content, for each frame of the trajectory, which will be printed in the first subplot of the figure:</p><pre><code class="language-julia-repl hljs">julia&gt; ahelix = ss_content(is_alphahelix, ssmap)
+julia&gt; Plots.default(fontfamily=&quot;Computer Modern&quot;,linewidth=2,framestyle=:box)</code></pre><p>We then initialize a plot with two pannels. The upper supblot will contain the <span>$\alpha$</span>-helical content as a function simulation frames, and the lower subplot will contain the average content of helices for each residue.</p><pre><code class="language-julia-repl hljs">julia&gt; plt = plot(layout=(2,1))</code></pre><p>Next, we compute, from the secondary structure map, the <span>$\alpha$</span>-helical content, for each frame of the trajectory, which will be printed in the first subplot of the figure:</p><pre><code class="language-julia-repl hljs">julia&gt; ahelix = ss_content(is_alphahelix, ssmap)
 
 julia&gt; plot!(plt, subplot=1, 
            ahelix, label=nothing, 
@@ -106,7 +106,7 @@ julia&gt; xlabels = one_letter_names .* string_numbers
            xlabel=&quot;Residue&quot;,
            ylabel=&quot;α-helical content&quot;,
            xticks=(residue_indexes[begin:5:end], xlabels[begin:5:end]),
-           xrotation=60, linewidth=2,
+           xrotation=60,
        )
 
-julia&gt; savefig(&quot;./helical_content.svg&quot;)</code></pre><p>The final line saves the figure to an external file.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../single_pdb/">« Single PDB files</a><a class="docs-footer-nextpage" href="../reference/">Reference »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Thursday 13 July 2023 20:12">Thursday 13 July 2023</span>. Using Julia version 1.9.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
+julia&gt; savefig(&quot;./helical_content.svg&quot;)</code></pre><p>The final line saves the figure to an external file.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../single_pdb/">« Single PDB files</a><a class="docs-footer-nextpage" href="../reference/">Reference »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Thursday 13 July 2023 23:05">Thursday 13 July 2023</span>. Using Julia version 1.9.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
