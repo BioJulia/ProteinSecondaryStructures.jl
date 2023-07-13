@@ -12,9 +12,6 @@ dssp_executable = `$(DSSP_jll.mkdssp()) --mmcif-dictionary $(joinpath(DSSP_jll.a
 Run DSSP on the pdb file and return a vector containing the detailed
 secondary structure information for each residue.
 
-The `dssp` executable must be in the path or, alternatively, the `ProteinSecondaryStructures.dssp_executable`
-variable can be set to the full path of the executable.
-
 When passing a PDB file, by default only the atoms belonging to standard protein residues are considered. This can be changed by
 setting the `selection` keyword argument to a different selection string, or function, following the `PDBTools.jl` syntax.
 Note that `DSSP` will fail if residue or atoms types not recognized. 

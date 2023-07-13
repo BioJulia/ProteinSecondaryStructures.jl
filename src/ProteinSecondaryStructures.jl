@@ -19,6 +19,23 @@ export ss_content
 export ss_map
 
 import Base: @kwdef # for 1.6 compatibility
+
+"""
+    SSData
+
+A struct to hold secondary structure data for a single residue. The fields are:
+
+* `resname::String` - residue name
+* `chain::String` - chain identifier
+* `resnum::Int` - residue number
+* `sscode::String` - secondary structure code
+* `phi::Float64` - phi dihedral angle
+* `psi::Float64` - psi dihedral angle
+* `area::Float64` - solvent accessible area (stride specific)
+* `kappa::Float64` - virtual bond angle (dssp specific)
+* `alpha::Float64` - virtual torsion angle (dssp specific)
+
+"""
 @kwdef struct SSData
     resname::String
     chain::String
@@ -104,7 +121,7 @@ class(ss::SSData) = classes[ss.sscode]
 class(code_number::Int) = classes[number_to_code[code_number]]
 class(sscode::String) = classes[sscode]
 
-@doc """
+"""
     is_anyhelix(ss::SSData)
     is_alphahelix(ss::SSData)
     is_pihelix(ss::SSData)
@@ -121,20 +138,20 @@ class(sscode::String) = classes[sscode]
 Return `true` if the data is of the given secondary structure type.
 
 """
-function is_function end
+function _is_class end
 
-@doc (@doc is_function) is_anyhelix(ss::SSData) = ss.sscode in ("H", "G", "I", "P")
-@doc (@doc is_function) is_alphahelix(ss::SSData) = ss.sscode == "H"
-@doc (@doc is_function) is_pihelix(ss::SSData) = ss.sscode == "I"
-@doc (@doc is_function) is_kappahelix(ss::SSData) = ss.sscode == "P"
-@doc (@doc is_function) is_310helix(ss::SSData) = ss.sscode == "G"
-@doc (@doc is_function) is_anystrand(ss::SSData) = ss.sscode in ("E", "B")
-@doc (@doc is_function) is_betastrand(ss::SSData) = ss.sscode == "E"
-@doc (@doc is_function) is_betabridge(ss::SSData) = ss.sscode == "B"
-@doc (@doc is_function) is_turn(ss::SSData) = ss.sscode == "T"
-@doc (@doc is_function) is_bend(ss::SSData) = ss.sscode == "S"
-@doc (@doc is_function) is_coil(ss::SSData) = ss.sscode == "C"
-@doc (@doc is_function) is_loop(ss::SSData) = ss.sscode == " "
+@doc (@doc _is_class) is_anyhelix(ss::SSData) = ss.sscode in ("H", "G", "I", "P")
+@doc (@doc _is_class) is_alphahelix(ss::SSData) = ss.sscode == "H"
+@doc (@doc _is_class) is_pihelix(ss::SSData) = ss.sscode == "I"
+@doc (@doc _is_class) is_kappahelix(ss::SSData) = ss.sscode == "P"
+@doc (@doc _is_class) is_310helix(ss::SSData) = ss.sscode == "G"
+@doc (@doc _is_class) is_anystrand(ss::SSData) = ss.sscode in ("E", "B")
+@doc (@doc _is_class) is_betastrand(ss::SSData) = ss.sscode == "E"
+@doc (@doc _is_class) is_betabridge(ss::SSData) = ss.sscode == "B"
+@doc (@doc _is_class) is_turn(ss::SSData) = ss.sscode == "T"
+@doc (@doc _is_class) is_bend(ss::SSData) = ss.sscode == "S"
+@doc (@doc _is_class) is_coil(ss::SSData) = ss.sscode == "C"
+@doc (@doc _is_class) is_loop(ss::SSData) = ss.sscode == " "
 
 """
     ss_composition(data::AbstractVector{<:SSData})

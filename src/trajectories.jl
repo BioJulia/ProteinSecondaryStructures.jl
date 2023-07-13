@@ -23,7 +23,8 @@ end
 """
     ss_map(atoms::AbstractVector{<:PDBTools.Atom}, trajectory::Chemfiles.Trajectory)
 
-Calculate the secondary structure map of the trajectory. Returns a matrix of the secondary.
+Calculate the secondary structure map of the trajectory. 
+Returns a matrix of secondary structure codes, where each row is a residue and each column is a frame.
 
 """
 function ss_map(
@@ -97,11 +98,11 @@ is_loop(sscode::Int) = number_to_code[sscode] == " "
 """
     ss_content(f::F, ssmap::AbstractMatrix{Int})
 
-Calculate the secondary structure content of the trajectory. `f` is the function that returns,
+Calculates the secondary structure content of the trajectory. `f` is the function that returns,
 for each residue, if the secondary structure is of a certain type. For example, to calculate
 the alpha helix content, use `f = is_alphahelix`.
 
-Here, `ssmap` is the secondary structure map of the trajectory, as returned by `ss_map`.
+Here, `ssmap` is the secondary structure map of the trajectory, as returned by the `ss_map` function.
 
 """
 function ss_content(
@@ -118,8 +119,8 @@ end
 """
     ss_composition(ssmap::AbstractMatrix{Int}, iframe::Int}
 
-Calculate the secondary structure composition of the trajectory. Returns a dictionary of
-the secondary structure types and their counts, for the given frame.
+Calculates the secondary structure composition of the trajectory. Returns a dictionary of
+the secondary structure types and their counts, for the chosen frame.
 
 """
 function ss_composition(ssmap::AbstractMatrix{Int}, iframe::Int)
