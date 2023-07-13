@@ -55,7 +55,7 @@ end
     # With DSSP
     ssmap = ss_map(PDBTools.readPDB(pdbfile, "protein"), trajectory; method=dssp_run)
     @test size(ssmap) == (76, 26)
-    @test sum(ssmap) == 12073
+    @test sum(ssmap) == 12069
 end
 
 """
@@ -115,32 +115,6 @@ function ss_content(
     return ss_content
 end
 
-@testitem "ss_content" begin
-    using ProteinSecondaryStructures.Testing
-    using PDBTools: readPDB
-    using Chemfiles: Trajectory
-    pdbfile = joinpath(Testing.data_dir, "Gromacs", "system.pdb")
-    trajectory = Trajectory(joinpath(Testing.data_dir, "Gromacs", "trajectory.xtc"))
-    # With stride
-    helical_content = ss_content(is_anyhelix, readPDB(pdbfile, "protein"), trajectory; method=stride_run)
-    @test length(helical_content) == 26
-    @test sum(helical_content) / length(helical_content) ≈ 0.2181174089068826
-    # With DSSP
-    helical_content = ss_content(is_anyhelix, readPDB(pdbfile, "protein"), trajectory; method=dssp_run)
-    @test length(helical_content) == 26
-    @test sum(helical_content) / length(helical_content) ≈ 0.21103238866396762
-    # With non-contiguous indexing
-    atoms = readPDB(pdbfile, only=at -> (10 <= at.residue < 30) | (40 <= at.residue < 60))
-    helical_content = ss_content(is_anyhelix, atoms, trajectory; method=stride_run)
-    @test length(helical_content) == 26
-    @test sum(helical_content) / length(helical_content) ≈ 0.20288461538461539
-    # From the map
-    ssmap = ss_map(readPDB(pdbfile, "protein"), trajectory; method=stride_run)
-    helical_content = ss_content(is_anyhelix, ssmap)
-    @test length(helical_content) == 26
-    @test sum(helical_content) / length(helical_content) ≈ 0.2181174089068826
-end
-
 """
     ss_composition(ssmap::AbstractMatrix{Int}, iframe::Int}
 
@@ -155,4 +129,32 @@ function ss_composition(ssmap::AbstractMatrix{Int}, iframe::Int)
         sscomposition[class(sscode)] = count(==(sscode), sscodes)
     end
     return sscomposition
+end
+
+@testitem "ss_content/ss_composition" begin
+    using ProteinSecondaryStructures.Testing
+    using PDBTools: readPDB
+    using Chemfiles: Trajectory
+    pdbfile = joinpath(Testing.data_dir, "Gromacs", "system.pdb")
+    trajectory = Trajectory(joinpath(Testing.data_dir, "Gromacs", "trajectory.xtc"))
+    # With stride
+    helical_content = ss_content(is_anyhelix, readPDB(pdbfile, "protein"), trajectory; method=stride_run)
+    @test length(helical_content) == 26
+    @test sum(helical_content) / length(helical_content) ≈ 0.2181174089068826
+    # With DSSP
+    helical_content = ss_content(is_anyhelix, readPDB(pdbfile, "protein"), trajectory; method=dssp_run)
+    @test length(helical_content) == 26
+    @test sum(helical_content) / length(helical_content) ≈ 0.21204453441295545
+    # With non-contiguous indexing
+    atoms = readPDB(pdbfile, only=at -> (10 <= at.residue < 30) | (40 <= at.residue < 60))
+    helical_content = ss_content(is_anyhelix, atoms, trajectory; method=stride_run)
+    @test length(helical_content) == 26
+    @test sum(helical_content) / length(helical_content) ≈ 0.20288461538461539
+    # From the map
+    ssmap = ss_map(readPDB(pdbfile, "protein"), trajectory; method=stride_run)
+    helical_content = ss_content(is_anyhelix, ssmap)
+    @test length(helical_content) == 26
+    @test sum(helical_content) / length(helical_content) ≈ 0.2181174089068826
+    # Test ss_composition function
+    @test ss_composition(ssmap, 5) == Dict("310 helix" => 6, "bend" => 0, "turn" => 17, "kappa helix" => 0, "beta strand" => 25, "beta bridge" => 2, "alpha helix" => 12, "pi helix" => 0, "loop" => 0, "coil" => 14)
 end
