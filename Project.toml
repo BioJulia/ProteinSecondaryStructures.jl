@@ -10,6 +10,7 @@ ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
 TestItems = "1c621080-faea-4a02-84b6-bbd5e436b8fe"
 
 [compat]
+Aqua = "0.6"
 Chemfiles = "0.10"
 PDBTools = "0.13.14"
 ProgressMeter = "1.7"
@@ -17,10 +18,11 @@ TestItems = "0.1"
 julia = "1.6"
 
 [extras]
+Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
 Chemfiles = "46823bd8-5fb3-5f92-9aa0-96921f3dd015"
 PDBTools = "e29189f1-7114-4dbd-93d0-c5673a921a58"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 TestItemRunner = "f8b46487-2199-4994-9208-9a1283c18c0a"
 
 [targets]
-test = ["Test", "Chemfiles", "PDBTools", "TestItemRunner"]
+test = ["Aqua", "Test", "Chemfiles", "PDBTools", "TestItemRunner"]
