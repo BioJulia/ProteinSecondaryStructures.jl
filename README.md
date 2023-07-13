@@ -4,7 +4,7 @@ This package parses [STRIDE]( http://webclu.bio.wzw.tum.de/stride/) and [DSSP](h
 
 ## Documentation
 
-Go to: https://m3g.github.io/ProteinSecondaryStructures
+Go to: https://m3g.github.io/ProteinSecondaryStructures.jl
 
 ## Citations
 
