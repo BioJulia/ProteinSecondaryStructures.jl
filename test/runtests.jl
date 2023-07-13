@@ -1,6 +1,11 @@
 using TestItemRunner
 @run_package_tests
 
+@testitem "Aqua.test_all" begin
+    import Aqua
+    Aqua.test_all(ProteinSecondaryStructures)
+end
+
 @testitem "from pdb file" begin
     using ProteinSecondaryStructures.Testing
     for i in eachindex(examples)
