@@ -5,14 +5,18 @@ version = "0.2.1-DEV"
 
 [deps]
 Chemfiles = "46823bd8-5fb3-5f92-9aa0-96921f3dd015"
+DSSP_jll = "74334e00-59ce-546d-b517-81f3b7e1d491"
 PDBTools = "e29189f1-7114-4dbd-93d0-c5673a921a58"
 ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
+STRIDE_jll = "850473c1-9ef0-5df9-a957-757f4cde8b8b"
 TestItems = "1c621080-faea-4a02-84b6-bbd5e436b8fe"
 
 [compat]
 Chemfiles = "0.10"
+DSSP_jll = "4"
 PDBTools = "0.13.14"
 ProgressMeter = "1.7"
+STRIDE_jll = "1"
 TestItems = "0.1"
 julia = "1.6"
 

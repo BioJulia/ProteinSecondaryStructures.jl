@@ -2,8 +2,8 @@
 # Interface for the DSSP secondary stucture determination program
 #
 
-# Assume "dssp" is in the path
-dssp_executable = "dssp"
+import DSSP_jll
+dssp_executable = `$(DSSP_jll.mkdssp()) --mmcif-dictionary $(joinpath(DSSP_jll.artifact_dir, "share", "dssp", "mmcif_pdbx.dic"))`
 
 """
     dssp_run(pdb_file::String; selection="protein")
