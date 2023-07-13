@@ -2,8 +2,8 @@
 # Interface for the STRIDE secondary structure prediction program
 #
 
-# Assume "stride" is in the path
-stride_executable = "stride"
+import STRIDE_jll
+stride_executable = STRIDE_jll.stride_exe()
 
 """
     stride_run(pdb_file::String; selection="protein")

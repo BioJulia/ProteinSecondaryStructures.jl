@@ -17,25 +17,6 @@ This package parses [STRIDE]( http://webclu.bio.wzw.tum.de/stride/) and [DSSP](h
 
 ## Installation
 
-Obtain `stride` and/or `dssp` programs from the corresponding repositories, compile it and add it to your path:
-
-For `stride`:
-
-```bash
-git clone https://github.com/m3g/stride
-cd stride/src
-make
-cp ./stride /usr/local/bin # or somewhere in the path
-```
-
-For `dssp`:
-
-```
-sudo apt install dssp # on Ubuntu-based linux distributions
-```
-
-or go to: https://github.com/PDB-REDO/dssp
-
 In Julia, install `ProteinSecondaryStructures` with:
 
 ```julia
