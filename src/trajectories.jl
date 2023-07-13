@@ -6,15 +6,15 @@ function ss_frame!(
     atoms::AbstractVector{<:PDBTools.Atom},
     atom_indices::Vector{Int},
     frame::Chemfiles.Frame;
-    method::F=stride_run,
+    method::F=stride_run
 ) where {F<:Function}
     coordinates = Chemfiles.positions(frame)
-    for (i,col) in enumerate(eachcol(coordinates))
+    for (i, col) in enumerate(eachcol(coordinates))
         iatom = findfirst(==(i), atom_indices)
         if !isnothing(iatom)
-           atoms[iatom].x = col[1]
-           atoms[iatom].y = col[2]
-           atoms[iatom].z = col[3]
+            atoms[iatom].x = col[1]
+            atoms[iatom].y = col[2]
+            atoms[iatom].z = col[3]
         end
     end
     return method(atoms)
@@ -29,14 +29,14 @@ Calculate the secondary structure map of the trajectory. Returns a matrix of the
 function ss_map(
     atoms::AbstractVector{<:PDBTools.Atom},
     trajectory::Chemfiles.Trajectory;
-    method::F=stride_run,
+    method::F=stride_run
 ) where {F<:Function}
     atom_indices = [atom.index for atom in atoms]
-    ss_map = zeros(Int,length(PDBTools.eachresidue(atoms)), length(trajectory))
+    ss_map = zeros(Int, length(PDBTools.eachresidue(atoms)), length(trajectory))
     @showprogress for (iframe, frame) in enumerate(trajectory)
         ss = ss_frame!(atoms, atom_indices, frame; method=method)
         for (i, ssdata) in pairs(ss)
-            ss_map[i,iframe] = code_to_number[ssdata.sscode]
+            ss_map[i, iframe] = code_to_number[ssdata.sscode]
         end
     end
     return ss_map
@@ -46,8 +46,8 @@ end
     using ProteinSecondaryStructures.Testing
     import PDBTools
     import Chemfiles
-    pdbfile = joinpath(Testing.data_dir,"Gromacs","system.pdb")
-    trajectory = Chemfiles.Trajectory(joinpath(Testing.data_dir,"Gromacs","trajectory.xtc"))
+    pdbfile = joinpath(Testing.data_dir, "Gromacs", "system.pdb")
+    trajectory = Chemfiles.Trajectory(joinpath(Testing.data_dir, "Gromacs", "trajectory.xtc"))
     # With stride
     ssmap = ss_map(PDBTools.readPDB(pdbfile, "protein"), trajectory; method=stride_run)
     @test size(ssmap) == (76, 26)
@@ -67,16 +67,16 @@ the alpha helix content, use `f = is_alphahelix`.
 
 """
 function ss_content(
-    f::F, 
-    atoms::AbstractVector{<:PDBTools.Atom}, 
+    f::F,
+    atoms::AbstractVector{<:PDBTools.Atom},
     trajectory::Chemfiles.Trajectory;
-    method::G=stride_run,
-) where {F<:Function, G<:Function}
+    method::G=stride_run
+) where {F<:Function,G<:Function}
     atom_indices = [atom.index for atom in atoms]
     ss_content = zeros(Float64, length(trajectory))
-    @showprogress for (iframe,frame) in enumerate(trajectory)
+    @showprogress for (iframe, frame) in enumerate(trajectory)
         ss = ss_frame!(atoms, atom_indices, frame; method=method)
-        ss_content[iframe] = count(f, ss) / max(1,length(ss))
+        ss_content[iframe] = count(f, ss) / max(1, length(ss))
     end
     return ss_content
 end
@@ -108,9 +108,9 @@ function ss_content(
     f::F,
     ssmap::AbstractMatrix{Int},
 ) where {F<:Function}
-    ss_content = zeros(Float64, size(ssmap,2))
+    ss_content = zeros(Float64, size(ssmap, 2))
     for (iframe, sscomposition) in enumerate(eachcol(ssmap))
-        ss_content[iframe] = count(f, sscomposition) / max(1,length(sscomposition))
+        ss_content[iframe] = count(f, sscomposition) / max(1, length(sscomposition))
     end
     return ss_content
 end
@@ -119,26 +119,26 @@ end
     using ProteinSecondaryStructures.Testing
     using PDBTools: readPDB
     using Chemfiles: Trajectory
-    pdbfile = joinpath(Testing.data_dir,"Gromacs","system.pdb")
-    trajectory = Trajectory(joinpath(Testing.data_dir,"Gromacs","trajectory.xtc"))
+    pdbfile = joinpath(Testing.data_dir, "Gromacs", "system.pdb")
+    trajectory = Trajectory(joinpath(Testing.data_dir, "Gromacs", "trajectory.xtc"))
     # With stride
     helical_content = ss_content(is_anyhelix, readPDB(pdbfile, "protein"), trajectory; method=stride_run)
     @test length(helical_content) == 26
-    @test sum(helical_content)/length(helical_content) ≈ 0.2181174089068826
+    @test sum(helical_content) / length(helical_content) ≈ 0.2181174089068826
     # With DSSP
     helical_content = ss_content(is_anyhelix, readPDB(pdbfile, "protein"), trajectory; method=dssp_run)
     @test length(helical_content) == 26
-    @test sum(helical_content)/length(helical_content) ≈ 0.21103238866396762
+    @test sum(helical_content) / length(helical_content) ≈ 0.21103238866396762
     # With non-contiguous indexing
-    atoms = readPDB(pdbfile, only = at -> (10 <= at.residue < 30) | (40 <= at.residue < 60))
+    atoms = readPDB(pdbfile, only=at -> (10 <= at.residue < 30) | (40 <= at.residue < 60))
     helical_content = ss_content(is_anyhelix, atoms, trajectory; method=stride_run)
     @test length(helical_content) == 26
-    @test sum(helical_content)/length(helical_content) ≈ 0.20288461538461539
+    @test sum(helical_content) / length(helical_content) ≈ 0.20288461538461539
     # From the map
     ssmap = ss_map(readPDB(pdbfile, "protein"), trajectory; method=stride_run)
     helical_content = ss_content(is_anyhelix, ssmap)
     @test length(helical_content) == 26
-    @test sum(helical_content)/length(helical_content) ≈ 0.2181174089068826
+    @test sum(helical_content) / length(helical_content) ≈ 0.2181174089068826
 end
 
 """
@@ -150,9 +150,9 @@ the secondary structure types and their counts, for the given frame.
 """
 function ss_composition(ssmap::AbstractMatrix{Int}, iframe::Int)
     sscomposition = Dict{String,Int}()
-    sscodes = @view(ssmap[:,iframe])
+    sscodes = @view(ssmap[:, iframe])
     for sscode in keys(number_to_code)
-        sscomposition[class(sscode)] = count(==(sscode), sscodes)    
+        sscomposition[class(sscode)] = count(==(sscode), sscodes)
     end
     return sscomposition
 end

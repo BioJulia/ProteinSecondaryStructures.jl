@@ -8,7 +8,7 @@ import PDBTools
 export SSData
 
 export stride_run
-export dssp_run 
+export dssp_run
 
 export is_anyhelix, is_alphahelix, is_pihelix, is_310helix, is_kappahelix
 export is_anystrand, is_betastrand, is_betabridge
@@ -19,7 +19,7 @@ export ss_content
 export ss_map
 
 import Base: @kwdef # for 1.6 compatibility
-@kwdef struct SSData 
+@kwdef struct SSData
     resname::String
     chain::String
     resnum::Int
@@ -146,7 +146,7 @@ the secondary structure types and their counts.
 function ss_composition(data::AbstractVector{<:SSData})
     sscomposition = Dict{String,Int}()
     for sscode in keys(classes)
-        sscomposition[class(sscode)] = count(ss -> ss.sscode == sscode, data)    
+        sscomposition[class(sscode)] = count(ss -> ss.sscode == sscode, data)
     end
     return sscomposition
 end

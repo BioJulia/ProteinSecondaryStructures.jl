@@ -22,7 +22,7 @@ Note that `STRIDE` will fail if residue or atoms types not recognized.
 """
 function stride_run end
 
-function stride_pdb_header() 
+function stride_pdb_header()
     strip(
         """  
         HEADER    ABC  PROTEIN                               01-JAN-00   1ABC
@@ -31,7 +31,7 @@ function stride_pdb_header()
 end
 
 function stride_run(atoms::AbstractVector{<:PDBTools.Atom}; fix_header=true)
-    tmp_file = tempname()*".pdb"
+    tmp_file = tempname() * ".pdb"
     # If the header is not in the correct format, stride will fail
     if fix_header
         PDBTools.writePDB(atoms, tmp_file; header=stride_pdb_header(), footer=nothing)
@@ -39,32 +39,32 @@ function stride_run(atoms::AbstractVector{<:PDBTools.Atom}; fix_header=true)
         PDBTools.writePDB(atoms, tmp_file)
     end
     # Run stride on the pdb file
-    stride_raw_data = try 
+    stride_raw_data = try
         readchomp(pipeline(`$stride_executable $tmp_file`))
-    catch 
-        "error" 
+    catch
+        "error"
     end
-    ssvector = [ SSData(r.resname, r.chain, r.resnum) for r in PDBTools.eachresidue(atoms) ]
+    ssvector = [SSData(r.resname, r.chain, r.resnum) for r in PDBTools.eachresidue(atoms)]
     #      ASG    Detailed secondary structure assignment
-	#      Format:  6-8  Residue name
-	#	      10-10 Protein chain identifier
-	#	      12-15 PDB	residue	number
-	#	      17-20 Ordinal residue number
-	#	      25-25 One	letter secondary structure code	**)
-	#	      27-39 Full secondary structure name
-	#	      43-49 Phi	angle
-	#	      53-59 Psi	angle
-	#	      65-69 Residue solvent accessible area
+    #      Format:  6-8  Residue name
+    #	      10-10 Protein chain identifier
+    #	      12-15 PDB	residue	number
+    #	      17-20 Ordinal residue number
+    #	      25-25 One	letter secondary structure code	**)
+    #	      27-39 Full secondary structure name
+    #	      43-49 Phi	angle
+    #	      53-59 Psi	angle
+    #	      65-69 Residue solvent accessible area
     for line in split(stride_raw_data, "\n")
         if startswith(line, "ASG")
             ss_residue = SSData(
-                resname = line[6:8],
-                chain = line[10:10],
-                resnum = parse(Int, line[12:15]),
-                sscode = uppercase(line[25:25]), # stride sometimes returns "b" instead of "B"
-                phi = parse(Float64, line[43:49]),
-                psi = parse(Float64, line[53:59]),
-                area = parse(Float64, line[65:69])
+                resname=line[6:8],
+                chain=line[10:10],
+                resnum=parse(Int, line[12:15]),
+                sscode=uppercase(line[25:25]), # stride sometimes returns "b" instead of "B"
+                phi=parse(Float64, line[43:49]),
+                psi=parse(Float64, line[53:59]),
+                area=parse(Float64, line[65:69])
             )
             iss = findfirst(ss -> residue_match(ss_residue, ss), ssvector)
             if !isnothing(iss)
@@ -77,7 +77,7 @@ function stride_run(atoms::AbstractVector{<:PDBTools.Atom}; fix_header=true)
 end
 
 # From a PDB file
-function stride_run(pdb_file::String; selection="protein", fix_header=true) 
+function stride_run(pdb_file::String; selection="protein", fix_header=true)
     atoms = PDBTools.readPDB(pdb_file, selection)
     return stride_run(atoms; fix_header=fix_header)
 end

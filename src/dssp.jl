@@ -22,7 +22,7 @@ Note that `DSSP` will fail if residue or atoms types not recognized.
 """
 function dssp_run end
 
-function dssp_pdb_header() 
+function dssp_pdb_header()
     strip("""
           HEADER
           TITLE     TITLE
@@ -35,12 +35,11 @@ function dssp_pdb_header()
           """)
 end
 
-const dssp_init_line =
-    "  #  RESIDUE AA STRUCTURE BP1 BP2  ACC     N-H-->O    O-->H-N    N-H-->O    O-->H-N    TCO  KAPPA ALPHA  PHI   PSI    X-CA   Y-CA   Z-CA"
+const dssp_init_line = "  #  RESIDUE AA STRUCTURE BP1 BP2  ACC     N-H-->O    O-->H-N    N-H-->O    O-->H-N    TCO  KAPPA ALPHA  PHI   PSI    X-CA   Y-CA   Z-CA"
 
 # From the PDBTools.Atom vector
 function dssp_run(atoms::AbstractVector{<:PDBTools.Atom}; fix_header=true)
-    tmp_file = tempname()*".pdb"
+    tmp_file = tempname() * ".pdb"
     # if the header is not in the correct format, dssp will fail
     if fix_header
         PDBTools.writePDB(atoms, tmp_file; header=dssp_pdb_header(), footer=nothing)
@@ -48,12 +47,12 @@ function dssp_run(atoms::AbstractVector{<:PDBTools.Atom}; fix_header=true)
         PDBTools.writePDB(atoms, tmp_file)
     end
     # Run dssp on the pdb file
-    dssp_raw_data = try 
+    dssp_raw_data = try
         readchomp(pipeline(`$dssp_executable --output-format dssp $tmp_file`))
-    catch 
+    catch
         "error"
     end
-    ssvector = [ SSData(r.resname, r.chain, r.resnum) for r in PDBTools.eachresidue(atoms) ]
+    ssvector = [SSData(r.resname, r.chain, r.resnum) for r in PDBTools.eachresidue(atoms)]
     isnothing(dssp_raw_data) && return ssvector
     data_begin = false
     for line in split(dssp_raw_data, "\n")
@@ -64,15 +63,15 @@ function dssp_run(atoms::AbstractVector{<:PDBTools.Atom}; fix_header=true)
         !data_begin && continue
         line[14] == '!' && continue
         ss_residue = SSData(
-                resname = PDBTools.threeletter(line[14]),
-                chain = "$(line[12])",
-                resnum = parse(Int, line[6:10]),
-                sscode = "$(line[17])",
-                phi = parse(Float64, line[104:109]),
-                psi = parse(Float64, line[110:115]),
-                kappa = parse(Float64, line[92:97]),
-                alpha = parse(Float64, line[98:103]),
-            )
+            resname=PDBTools.threeletter(line[14]),
+            chain="$(line[12])",
+            resnum=parse(Int, line[6:10]),
+            sscode="$(line[17])",
+            phi=parse(Float64, line[104:109]),
+            psi=parse(Float64, line[110:115]),
+            kappa=parse(Float64, line[92:97]),
+            alpha=parse(Float64, line[98:103]),
+        )
         iss = findfirst(ss -> residue_match(ss_residue, ss), ssvector)
         if !isnothing(iss)
             ssvector[iss] = ss_residue
