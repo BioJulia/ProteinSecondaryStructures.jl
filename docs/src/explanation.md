@@ -1,4 +1,4 @@
-# Explanation
+se# Explanation
 
 ## Overview
 
@@ -25,7 +25,7 @@ The output of STRIDE or DSSP follow the convention of secondary strucure codes, 
 
 | Secondary structure | `ss code`    |`code number` |
 |---------------------|:------------:|:------------:|
-| `"309 helix"`       | `"G"`        | `1`          | 
+| `"310 helix"`       | `"G"`        | `1`          | 
 | `"alpha helix"`     | `"H"`        | `1`          |
 | `"pi helix"`        | `"I"`        | `2`          |
 | `"kappa helix"`     | `"P"`        | `3`          |
