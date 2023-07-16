@@ -45,9 +45,15 @@ from trajectory runs.
 
 The output of the secondary structure calculations is a vector of `SSData` elements, with the following data, for each residue:
 
-```@docs
-SSData
-```
+* `resname::String` - residue name
+* `chain::String` - chain identifier
+* `resnum::Int` - residue number
+* `sscode::String` - secondary structure code
+* `phi::Float64` - phi dihedral angle
+* `psi::Float64` - psi dihedral angle
+* `area::Float64` - solvent accessible area (stride specific)
+* `kappa::Float64` - virtual bond angle (dssp specific)
+* `alpha::Float64` - virtual torsion angle (dssp specific)
 
 The output of `stride_run` or `dssp_run` is a vector of `SSData` structures, one for each residue. For example: 
 
