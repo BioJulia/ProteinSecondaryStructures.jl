@@ -14,7 +14,7 @@ TestItems = "1c621080-faea-4a02-84b6-bbd5e436b8fe"
 [compat]
 Aqua = "0.6"
 Chemfiles = "0.10"
-DSSP_jll = "= 4.3.1"
+DSSP_jll = "= 4.4.0"
 PDBTools = "0.13.14"
 ProgressMeter = "1.7"
 STRIDE_jll = "1"
