@@ -52,7 +52,8 @@ function stride_run(atoms::AbstractVector{<:PDBTools.Atom}; fix_header=true)
     #	      43-49 Phi	angle
     #	      53-59 Psi	angle
     #	      65-69 Residue solvent accessible area
-    for line in split(stride_raw_data, "\n")
+    end_of_line = Sys.iswindows() ? "\r\n" : "\n"
+    for line in split(stride_raw_data, end_of_line)
         if startswith(line, "ASG")
             ss_residue = SSData(
                 resname=line[6:8],
