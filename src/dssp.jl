@@ -52,7 +52,8 @@ function dssp_run(atoms::AbstractVector{<:PDBTools.Atom}; fix_header=true)
     ssvector = [SSData(r.resname, r.chain, r.resnum) for r in PDBTools.eachresidue(atoms)]
     isnothing(dssp_raw_data) && return ssvector
     data_begin = false
-    for line in split(dssp_raw_data, "\n")
+    end_of_line = Sys.iswindows() ? "\r\n" : "\n"
+    for line in split(dssp_raw_data, end_of_line)
         if line == dssp_init_line
             data_begin = true
             continue
