@@ -1,0 +1,112 @@
+<!DOCTYPE html>
+<html lang="en"><head><meta charset="UTF-8"/><meta name="viewport" content="width=device-width, initial-scale=1.0"/><title>MD Trajectories · ProteinSecondaryStructures.jl</title><script data-outdated-warner src="../assets/warner.js"></script><link href="https://cdnjs.cloudflare.com/ajax/libs/lato-font/3.0.0/css/lato-font.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/juliamono/0.045/juliamono.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/fontawesome.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/solid.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/font-awesome/5.15.4/css/brands.min.css" rel="stylesheet" type="text/css"/><link href="https://cdnjs.cloudflare.com/ajax/libs/KaTeX/0.13.24/katex.min.css" rel="stylesheet" type="text/css"/><script>documenterBaseURL=".."</script><script src="https://cdnjs.cloudflare.com/ajax/libs/require.js/2.3.6/require.min.js" data-main="../assets/documenter.js"></script><script src="../siteinfo.js"></script><script src="../../versions.js"></script><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-dark.css" data-theme-name="documenter-dark" data-theme-primary-dark/><link class="docs-theme-link" rel="stylesheet" type="text/css" href="../assets/themes/documenter-light.css" data-theme-name="documenter-light" data-theme-primary/><script src="../assets/themeswap.js"></script></head><body><div id="documenter"><nav class="docs-sidebar"><a class="docs-logo" href="../"><img src="../assets/logo.svg" alt="ProteinSecondaryStructures.jl logo"/></a><div class="docs-package-name"><span class="docs-autofit"><a href="../">ProteinSecondaryStructures.jl</a></span></div><form class="docs-search" action="../search/"><input class="docs-search-query" id="documenter-search-query" name="q" type="text" placeholder="Search docs"/></form><ul class="docs-menu"><li><a class="tocitem" href="../">Home</a></li><li><a class="tocitem" href="../explanation/">Explanation</a></li><li><a class="tocitem" href="../single_pdb/">Single PDB files</a></li><li class="is-active"><a class="tocitem" href>MD Trajectories</a><ul class="internal"><li><a class="tocitem" href="#Secondary-structure-map"><span>Secondary structure map</span></a></li><li><a class="tocitem" href="#Saving-and-loading-a-map"><span>Saving and loading a map</span></a></li><li><a class="tocitem" href="#Secondary-structure-classes"><span>Secondary structure classes</span></a></li><li><a class="tocitem" href="#Average-structure-per-residue"><span>Average structure per residue</span></a></li></ul></li><li><a class="tocitem" href="../reference/">Reference</a></li><li><a class="tocitem" href="../citations/">Citations</a></li></ul><div class="docs-version-selector field has-addons"><div class="control"><span class="docs-label button is-static is-size-7">Version</span></div><div class="docs-selector control is-expanded"><div class="select is-fullwidth is-size-7"><select id="documenter-version-selector"></select></div></div></div></nav><div class="docs-main"><header class="docs-navbar"><nav class="breadcrumb"><ul class="is-hidden-mobile"><li class="is-active"><a href>MD Trajectories</a></li></ul><ul class="is-hidden-tablet"><li class="is-active"><a href>MD Trajectories</a></li></ul></nav><div class="docs-right"><a class="docs-edit-link" href="https://github.com/m3g/ProteinSecondaryStructures.jl/blob/main/docs/src/trajectories.md" title="Edit on GitHub"><span class="docs-icon fab"></span><span class="docs-label is-hidden-touch">Edit on GitHub</span></a><a class="docs-settings-button fas fa-cog" id="documenter-settings-button" href="#" title="Settings"></a><a class="docs-sidebar-button fa fa-bars is-hidden-desktop" id="documenter-sidebar-button" href="#"></a></div></header><article class="content" id="documenter-page"><h1 id="Molecular-Dynamics-Trajectories"><a class="docs-heading-anchor" href="#Molecular-Dynamics-Trajectories">Molecular Dynamics Trajectories</a><a id="Molecular-Dynamics-Trajectories-1"></a><a class="docs-heading-anchor-permalink" href="#Molecular-Dynamics-Trajectories" title="Permalink"></a></h1><p>This package provides convenience functions to analyze the secondary structure along molecular dynamics simulations. The user must provide a <code>PDB</code> file of the system  simulated and a trajectory file, which may be of one of the most common formats, as supported by <a href="https://chemfiles.org/">Chemfiles</a>. </p><h2 id="Secondary-structure-map"><a class="docs-heading-anchor" href="#Secondary-structure-map">Secondary structure map</a><a id="Secondary-structure-map-1"></a><a class="docs-heading-anchor-permalink" href="#Secondary-structure-map" title="Permalink"></a></h2><p>The secondary structure map is the profile of the secondary structure computed for  each frame of the trajectory. This computation may be costly, particularly with the  DSSP algorithm, so it is recommeded to save the result. See <a href="#Saving-and-loading-a-map">Saving and loading a map</a> for further information. </p><p>A complete example for computing a secondary structure map is shown below:</p><pre><code class="language-julia hljs">using ProteinSecondaryStructures 
+using PDBTools: readPDB 
+using Chemfiles: Trajectory
+
+pdbfile = ProteinSecondaryStructures.Testing.data_dir*&quot;/Gromacs/system.pdb&quot;
+trajectory_file = ProteinSecondaryStructures.Testing.data_dir*&quot;/Gromacs/trajectory.xtc&quot;
+
+atoms = readPDB(pdbfile, &quot;protein&quot;)
+trajectory = Trajectory(trajectory_file)
+
+ssmap = ss_map(atoms, trajectory) # returns a Matrix{Int}</code></pre><p>In the example, we loaded a Gromacs <code>xtc</code> trajectory.  The method used to compute the secondary structure can be selected with the <code>method</code> keyword parameter, which defaults to <code>stride</code>:</p><pre><code class="language-julia hljs">ssmap = ss_map(atoms, trajectory; method=stride_run)
+ssmap = ss_map(atoms, trajectory; method=dssp_run)</code></pre><div class="admonition is-info"><header class="admonition-header">Note</header><div class="admonition-body"><p>Importantly, note that we have selected the <code>&quot;protein&quot;</code> atoms when reading the PDB  file of the trajectory. This is important, both to avoid unnecessary reading and  writting of coordiantes which are of no interest, and to guarantee that the  algorithm for computing secondary structure will not fail.</p></div></div><p>This will create a matrix that can be visualized, for instance, with:</p><pre><code class="language-julia hljs">using Plots
+heatmap(ssmap,
+  xlabel=&quot;frame&quot;,
+  ylabel=&quot;residue&quot;,
+  framestyle=:box,
+  color=palette(:tab20c,10)
+)</code></pre><p>producing the figure:</p><p><img src="../assets/map.svg" alt="heatmap"/></p><p>where the colors refer to the <code>code number</code> fields of the <a href="@ref">Secondary structure classes</a> table.</p><h2 id="Saving-and-loading-a-map"><a class="docs-heading-anchor" href="#Saving-and-loading-a-map">Saving and loading a map</a><a id="Saving-and-loading-a-map-1"></a><a class="docs-heading-anchor-permalink" href="#Saving-and-loading-a-map" title="Permalink"></a></h2><p>The secondary structure map computed is just a matrix of integer codes. Thus, it can be saved or read in any preferred format. As a suggestion, it is possible to use <code>writedlm</code> and <code>readdlm</code> function from the <code>DelimitedFiles</code> package: </p><pre><code class="language-julia hljs">using DelimitedFiles
+# save data to ssmap.dat
+writedlm(&quot;ssmap.dat&quot;, ssmap)
+# load data
+ssmat = readdlm(&quot;ssmap.dat&quot;, Int)</code></pre><h2 id="Secondary-structure-classes"><a class="docs-heading-anchor" href="#Secondary-structure-classes">Secondary structure classes</a><a id="Secondary-structure-classes-1"></a><a class="docs-heading-anchor-permalink" href="#Secondary-structure-classes" title="Permalink"></a></h2><p>From a precomputed secondary structure map, or from a trajectory, helper functions will provide the content of a specific call of secondary structure along the simulation:</p><h3 id="From-the-secondary-structure-map"><a class="docs-heading-anchor" href="#From-the-secondary-structure-map">From the secondary structure map</a><a id="From-the-secondary-structure-map-1"></a><a class="docs-heading-anchor-permalink" href="#From-the-secondary-structure-map" title="Permalink"></a></h3><p>Calling <code>ss_content</code> with a class identifier function and a map (as computed above), will return the content of that class along the trajectory:</p><pre><code class="language-julia-repl hljs">julia&gt; ss_content(is_alphahelix, ssmap)
+26-element Vector{Float64}:
+ 0.21052631578947367
+ 0.15789473684210525
+ ⋮
+ 0.13157894736842105</code></pre><p>The composition of classes for a given frame can also be retrieved from the content map:</p><pre><code class="language-julia hljs">julia&gt; ss_composition(ssmap, 6)
+Dict{String, Int64} with 10 entries:
+  &quot;310 helix&quot;   =&gt; 7
+  &quot;bend&quot;        =&gt; 0
+  &quot;turn&quot;        =&gt; 17
+  &quot;kappa helix&quot; =&gt; 0
+  &quot;beta strand&quot; =&gt; 25
+  &quot;beta bridge&quot; =&gt; 2
+  &quot;alpha helix&quot; =&gt; 12
+  &quot;pi helix&quot;    =&gt; 0
+  &quot;loop&quot;        =&gt; 0
+  &quot;coil&quot;        =&gt; 13</code></pre><p>These functions are useful, because the computation of the secondary structure along the trajectory (the map) can be costly.</p><h3 id="Single-class,-througout-the-trajectory"><a class="docs-heading-anchor" href="#Single-class,-througout-the-trajectory">Single class, througout the trajectory</a><a id="Single-class,-througout-the-trajectory-1"></a><a class="docs-heading-anchor-permalink" href="#Single-class,-througout-the-trajectory" title="Permalink"></a></h3><p>If the user wants to compute the content of a single class of secondary structures along a trajectory, that can be done without precomputing the secondary structure map (note, however, that the cost is similar).</p><p>For example, in the following script we compute the content of <span>$\alpha$</span>-helices of the structure along the trajectory:</p><pre><code class="language-julia hljs">using ProteinSecondaryStructures 
+using PDBTools: readPDB 
+using Chemfiles: Trajectory
+
+pdbfile = ProteinSecondaryStructures.Testing.data_dir*&quot;/Gromacs/system.pdb&quot;
+trajectory_file = ProteinSecondaryStructures.Testing.data_dir*&quot;/Gromacs/trajectory.xtc&quot;
+
+atoms = readPDB(pdbfile, &quot;protein&quot;)
+trajectory = Trajectory(trajectory_file)
+
+helical_content = ss_content(is_alphahelix, atoms, trajectory)</code></pre><p>The method to compute the secondary structure can be defined with the <code>method</code> keyword: </p><pre><code class="language-julia hljs">helical_content = ss_content(is_alphahelix, atoms, trajectory; method=stride_run)
+#or
+helical_content = ss_content(is_alphahelix, atoms, trajectory; method=dssp_run)</code></pre><h2 id="Average-structure-per-residue"><a class="docs-heading-anchor" href="#Average-structure-per-residue">Average structure per residue</a><a id="Average-structure-per-residue-1"></a><a class="docs-heading-anchor-permalink" href="#Average-structure-per-residue" title="Permalink"></a></h2><p>Here we provide a example where we use some features of <code>PDBTools.jl</code> and <code>Plots</code> to illustrate the average content of <span>$\alpha$</span>-helices for each residue of the protein, along the simulation. </p><p>Here, we assume that a secondary structure map, <code>ssmap</code>, was computed using the instructions above.</p><p>The goal is to obtain a figure similar to this one, in which in the upper pannel we show the evolution of the total <span>$\alpha$</span>-helical content as a function of the simulation frames, and in the lower pannel we show the content of helices of each residue, with appropriate indexing. </p><p><img src="../assets/helical_content.svg" alt="helical content"/></p><p>The script to produce the figure above is a manipulation of the <code>ssmap</code> output, using function from <code>PDBTools</code> and the plotting features of <code>Plots</code>. THe complete script is:</p><pre><code class="language-julia hljs">using Plots, PDBTools
+Plots.default(fontfamily=&quot;Computer Modern&quot;,linewidth=2,framestyle=:box)
+plt = plot(layout=(2,1))
+ahelix = ss_content(is_alphahelix, ssmap)
+plot!(plt, subplot=1, 
+    ahelix, label=nothing,
+    xlabel=&quot;simulation frame&quot;, 
+    ylabel=&quot;α-helical content&quot;
+ )
+residue_indexes=1:length(eachresidue(atoms))
+one_letter_names = eachresidue(atoms) .|&gt; resname .|&gt; oneletter;
+string_numbers = eachresidue(atoms) .|&gt; resnum .|&gt; string;
+xlabels = one_letter_names .* string_numbers
+ahelix_avg = map(mean, eachrow(is_alphahelix.(ssmap)))
+xticks=(residue_indexes[begin:5:end],xlabels[begin:5:end])
+plot!(plt, subplot=2,
+    residue_indexes, 
+    ahelix_avg, 
+    label=nothing,
+    xlabel=&quot;Residue&quot;,
+    ylabel=&quot;α-helical content&quot;,
+    xticks=xticks, xrotation=60
+)
+savefig(&quot;./helical_content.svg&quot;)</code></pre><h4 id="Step-by-step-construction-of-the-figure"><a class="docs-heading-anchor" href="#Step-by-step-construction-of-the-figure">Step-by-step construction of the figure</a><a id="Step-by-step-construction-of-the-figure-1"></a><a class="docs-heading-anchor-permalink" href="#Step-by-step-construction-of-the-figure" title="Permalink"></a></h4><p>First, we load the <code>Plots</code> and <code>PDBTools</code> packages, and set some default parameters for <code>Plots</code> for prettier output.</p><pre><code class="language-julia-repl hljs">julia&gt; using Plots, PDBTools
+
+julia&gt; Plots.default(fontfamily=&quot;Computer Modern&quot;,linewidth=2,framestyle=:box)</code></pre><p>We then initialize a plot with two pannels. The upper supblot will contain the <span>$\alpha$</span>-helical content as a function simulation frames, and the lower subplot will contain the average content of helices for each residue.</p><pre><code class="language-julia-repl hljs">julia&gt; plt = plot(layout=(2,1))</code></pre><p>Next, we compute, from the secondary structure map, the <span>$\alpha$</span>-helical content, for each frame of the trajectory, which will be printed in the first subplot of the figure:</p><pre><code class="language-julia-repl hljs">julia&gt; ahelix = ss_content(is_alphahelix, ssmap)
+
+julia&gt; plot!(plt, subplot=1, 
+           ahelix, label=nothing, 
+           xlabel=&quot;simulation frame&quot;, 
+           ylabel=&quot;α-helical content&quot;
+        )</code></pre><p>For the second plot, we first define a residue range, with the number of residues of the protein, using <a href="https://m3g.github.io/PDBTools.jl/stable/selections/#Iterate-over-residues-(or-molecules)"><code>PDBTools.eachresidue</code></a> iterator. Here, <code>length(eachresidue(atoms))</code> is just the number of residues of the protein:</p><pre><code class="language-julia-repl hljs">julia&gt; residue_indexes=1:length(eachresidue(atoms))
+1:76</code></pre><p>We the extract the names of all residues, which we will use for creating the <code>x</code>-labels of our plot. We iterate over all residues first to extract their names, which are converted to <em>one-letter</em> codes, and these are concateneted (with the <code>*</code> operation on strings), with the residue numbers converted to strings: </p><pre><code class="language-julia-repl hljs">julia&gt; one_letter_names = eachresidue(atoms) .|&gt; resname .|&gt; oneletter;
+
+julia&gt; string_numbers = eachresidue(atoms) .|&gt; resnum .|&gt; string;
+
+julia&gt; xlabels = one_letter_names .* string_numbers
+76-element Vector{String}:
+ &quot;M1&quot;
+ &quot;Q2&quot;
+ ⋮
+ &quot;G76&quot;</code></pre><p>The <code>y</code>-axis of our plot will contain the average <span>$\alpha$</span>-helical content for each residue. To extract that, we will first convert the <code>ssmap</code> to matrix of <code>0</code>s and <code>1</code>s, with the broadcast of the <code>is_alphahelix</code> function:</p><pre><code class="language-julia-repl hljs">julia&gt; is_alphahelix.(ssmap)
+76×26 BitMatrix:
+ 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+ 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0
+ ⋮              ⋮              ⋮              ⋮              ⋮              ⋮
+ 0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0  0</code></pre><p>The average of each row is the the average content of helices for each residue:</p><pre><code class="language-julia-repl hljs">julia&gt; ahelix_avg = map(mean, eachrow(is_alphahelix.(ssmap)))
+76-element Vector{Float64}:
+ 0.0
+ 0.0
+ ⋮
+ 0.0</code></pre><p>We can finally plot the second supblot of our figure, with the note that we have filtered some <code>x</code>-tick labels to avoid having a crowded axis:</p><pre><code class="language-julia-repl hljs">julia&gt; plot!(plt, subplot=2,
+           residue_indexes, 
+           ahelix_avg, 
+           label=nothing,
+           xlabel=&quot;Residue&quot;,
+           ylabel=&quot;α-helical content&quot;,
+           xticks=(residue_indexes[begin:5:end], xlabels[begin:5:end]),
+           xrotation=60,
+       )
+
+julia&gt; savefig(&quot;./helical_content.svg&quot;)</code></pre><p>The final line saves the figure to an external file.</p></article><nav class="docs-footer"><a class="docs-footer-prevpage" href="../single_pdb/">« Single PDB files</a><a class="docs-footer-nextpage" href="../reference/">Reference »</a><div class="flexbox-break"></div><p class="footer-message">Powered by <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> and the <a href="https://julialang.org/">Julia Programming Language</a>.</p></nav></div><div class="modal" id="documenter-settings"><div class="modal-background"></div><div class="modal-card"><header class="modal-card-head"><p class="modal-card-title">Settings</p><button class="delete"></button></header><section class="modal-card-body"><p><label class="label">Theme</label><div class="select"><select id="documenter-themepicker"><option value="documenter-light">documenter-light</option><option value="documenter-dark">documenter-dark</option></select></div></p><hr/><p>This document was generated with <a href="https://github.com/JuliaDocs/Documenter.jl">Documenter.jl</a> version 0.27.25 on <span class="colophon-date" title="Tuesday 25 July 2023 14:05">Tuesday 25 July 2023</span>. Using Julia version 1.9.2.</p></section><footer class="modal-card-foot"></footer></div></div></div></body></html>
