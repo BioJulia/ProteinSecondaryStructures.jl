@@ -1,3 +1,11 @@
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://m3g.github.com/m3g/ProteinSecondaryStructures.jl/stable)
+[![Tests](https://img.shields.io/badge/build-passing-green)](https://github.com/m3g/ProteinSecondaryStructures.jl/actions)
+[![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
+
+<p align=center>
+<img src=https://raw.githubusercontent.com/m3g/ProteinSecondaryStructures.jl/main/docs/src/assets/logo.svg>
+</p>
+
 # ProteinSecondaryStructures.jl
 
 This package parses [STRIDE]( http://webclu.bio.wzw.tum.de/stride/) and [DSSP](https://github.com/PDB-REDO/dssp) secondary structure prediction outputs, to make them convenient to use from Julia, particularly for the analysis of MD simulations. 
