@@ -30,19 +30,24 @@ Returns a matrix of secondary structure codes, where each row is a residue and e
 The atoms to be considered may be provided directly with an `atoms` vector, or by reading a PDB file,
 in which case the `selection` keyword argument is used to select the atoms to be considered.
 
+The `show_progress` keyword argument controls whether a progress bar is shown.
+
 """
 function ss_map(
     atoms::AbstractVector{<:PDBTools.Atom},
     trajectory::Chemfiles.Trajectory;
-    method::F=stride_run
+    method::F=stride_run,
+    show_progress=true
 ) where {F<:Function}
     atom_indices = [atom.index for atom in atoms]
     ss_map = zeros(Int, length(PDBTools.eachresidue(atoms)), length(trajectory))
-    @showprogress for (iframe, frame) in enumerate(trajectory)
+    p = Progress(length(trajectory); enabled=show_progress)
+    for (iframe, frame) in enumerate(trajectory)
         ss = ss_frame!(atoms, atom_indices, frame; method=method)
         for (i, ssdata) in pairs(ss)
             ss_map[i, iframe] = code_to_number[ssdata.sscode]
         end
+        next!(p)
     end
     return ss_map
 end
@@ -84,18 +89,23 @@ Calculate the secondary structure content of the trajectory. `f` is the function
 for each residue, if the secondary structure is of a certain type. For example, to calculate 
 the alpha helix content, use `f = is_alphahelix`.
 
+The `show_progress` keyword argument controls whether a progress bar is shown.
+
 """
 function ss_content(
     f::F,
     atoms::AbstractVector{<:PDBTools.Atom},
     trajectory::Chemfiles.Trajectory;
-    method::G=stride_run
+    method::G=stride_run,
+    show_progress=true
 ) where {F<:Function,G<:Function}
     atom_indices = [atom.index for atom in atoms]
     ss_content = zeros(Float64, length(trajectory))
-    @showprogress for (iframe, frame) in enumerate(trajectory)
+    p = Progress(length(trajectory); enabled=show_progress)
+    for (iframe, frame) in enumerate(trajectory)
         ss = ss_frame!(atoms, atom_indices, frame; method=method)
         ss_content[iframe] = count(f, ss) / max(1, length(ss))
+        next!(p)
     end
     return ss_content
 end
