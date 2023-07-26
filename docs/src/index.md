@@ -1,6 +1,6 @@
 # ProteinSecondaryStructures.jl
 
-[ProteinSecondaryStructures](https://github.com/m3g/ProteinSecondaryStructures.jl) parses [STRIDE]( http://webclu.bio.wzw.tum.de/stride/) and [DSSP](https://github.com/PDB-REDO/dssp) secondary structure prediction outputs, to make them convenient to use from Julia, particularly for the analysis of molecular dynamics simulations. 
+[ProteinSecondaryStructures.jl](https://github.com/m3g/ProteinSecondaryStructures.jl) parses [STRIDE]( http://webclu.bio.wzw.tum.de/stride/) and [DSSP](https://github.com/PDB-REDO/dssp) secondary structure prediction outputs, to make them convenient to use from Julia, particularly for the analysis of molecular dynamics simulations. 
  
 ## Installation
 
