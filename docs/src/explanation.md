@@ -26,15 +26,15 @@ The output of STRIDE or DSSP follow the convention of secondary strucure codes, 
 | Secondary structure | `ss code`    |`code number` |
 |---------------------|:------------:|:------------:|
 | `"310 helix"`       | `"G"`        | `1`          | 
-| `"alpha helix"`     | `"H"`        | `1`          |
-| `"pi helix"`        | `"I"`        | `2`          |
-| `"kappa helix"`     | `"P"`        | `3`          |
-| `"turn"`            | `"T"`        | `4`          |
-| `"beta strand"`     | `"E"`        | `5`          |
-| `"beta bridge"`     | `"B"`        | `6`          |
-| `"bend"`            | `"S"`        | `7`          |
-| `"coil"`            | `"C"`        | `8`          |
-| `"loop"`            | `" "`        | `9`         |
+| `"alpha helix"`     | `"H"`        | `2`          |
+| `"pi helix"`        | `"I"`        | `3`          |
+| `"kappa helix"`     | `"P"`        | `4`          |
+| `"turn"`            | `"T"`        | `5`          |
+| `"beta strand"`     | `"E"`        | `6`          |
+| `"beta bridge"`     | `"B"`        | `7`          |
+| `"bend"`            | `"S"`        | `8`          |
+| `"coil"`            | `"C"`        | `9`          |
+| `"loop"`            | `" "`        | `10`         |
 
 See the [DSSP secondary structure classification](https://pdb-redo.eu/dssp/about) for further information.
 
