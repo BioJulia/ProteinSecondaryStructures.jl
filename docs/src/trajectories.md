@@ -74,7 +74,7 @@ writedlm("ssmap.dat", ssmap)
 ssmat = readdlm("ssmap.dat", Int)
 ```
 
-## Secondary structure classes
+## Trajectory secondary structure classes
 
 From a precomputed secondary structure map, or from a trajectory, helper functions
 will provide the content of a specific call of secondary structure along the simulation:

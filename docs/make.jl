@@ -6,6 +6,7 @@ push!(LOAD_PATH,"../src/")
 makedocs(
     modules=[ProteinSecondaryStructures],
     sitename="ProteinSecondaryStructures.jl",
+    warnonly = [:missing_docs],
     pages = [
         "Home" => "index.md",
         "Explanation" => "explanation.md",

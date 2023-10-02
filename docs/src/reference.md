@@ -26,5 +26,3 @@ ss_map
 ss_content
 ss_composition(::AbstractMatrix{Int}, ::Int)
 ```
-
-
