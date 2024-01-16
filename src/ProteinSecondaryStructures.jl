@@ -1,7 +1,7 @@
 module ProteinSecondaryStructures
 
-using TestItems
-using ProgressMeter
+using TestItems: @testitem
+using ProgressMeter: Progress, next!
 import Chemfiles
 import PDBTools
 

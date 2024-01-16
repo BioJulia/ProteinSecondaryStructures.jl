@@ -63,7 +63,7 @@ function ss_map(
 end
 
 @testitem "ss_map" begin
-    using ProteinSecondaryStructures.Testing
+    import ProteinSecondaryStructures.Testing
     import PDBTools
     import Chemfiles
     pdbfile = joinpath(Testing.data_dir, "Gromacs", "system.pdb")
@@ -161,7 +161,7 @@ function ss_composition(ssmap::AbstractMatrix{Int}, iframe::Int)
 end
 
 @testitem "ss_content/ss_composition" begin
-    using ProteinSecondaryStructures.Testing
+    import ProteinSecondaryStructures.Testing
     using PDBTools: readPDB
     using Chemfiles: Trajectory
     pdbfile = joinpath(Testing.data_dir, "Gromacs", "system.pdb")
