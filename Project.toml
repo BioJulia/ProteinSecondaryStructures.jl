@@ -1,7 +1,7 @@
 name = "ProteinSecondaryStructures"
 uuid = "c298f58b-271f-48cb-96ac-5442ca7c67d9"
 authors = ["Leandro Martinez <lmartine@unicamp.br> and contributors"]
-version = "1.1.0"
+version = "1.1.1-DEV"
 
 [deps]
 Chemfiles = "46823bd8-5fb3-5f92-9aa0-96921f3dd015"
