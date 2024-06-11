@@ -70,7 +70,7 @@ function dssp_run(atoms::AbstractVector{<:PDBTools.Atom}; fix_header=true)
             kappa=parse(Float64, line[92:97]),
             alpha=parse(Float64, line[98:103]),
         )
-        iss = findfirst(ss -> residue_match(ss_residue, ss), ssvector)
+        iss = findfirst(ss -> residues_match(ss_residue, ss), ssvector)
         if !isnothing(iss)
             ssvector[iss] = ss_residue
         end

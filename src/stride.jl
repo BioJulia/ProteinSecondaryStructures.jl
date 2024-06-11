@@ -64,7 +64,7 @@ function stride_run(atoms::AbstractVector{<:PDBTools.Atom}; fix_header=true)
                 psi=parse(Float64, line[53:59]),
                 area=parse(Float64, line[65:69])
             )
-            iss = findfirst(ss -> residue_match(ss_residue, ss), ssvector)
+            iss = findfirst(ss -> residues_match(ss_residue, ss), ssvector)
             if !isnothing(iss)
                 ssvector[iss] = ss_residue
             end

@@ -1,9 +1,23 @@
 # Reference
 
+```@meta
+CollapsedDocStrings = true
+```
+
 ## Basic data structure
 
 ```@docs
 SSData
+```
+
+## Class retriever functions
+
+```@docs
+class
+ProteinSecondaryStructures._is_class
+ss_composition
+ss_code_to_number
+ss_number_to_code
 ```
 
 ## Single-PDB runs
@@ -11,12 +25,6 @@ SSData
 ```@docs
 stride_run
 dssp_run
-```
-
-```@docs
-ss_composition(::AbstractVector{<:SSData})
-class
-ProteinSecondaryStructures._is_class
 ```
 
 ## For trajectory analysis
