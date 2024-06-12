@@ -14,6 +14,7 @@ SSData
 
 ```@docs
 class
+ss_classes
 ProteinSecondaryStructures._is_class
 ss_composition
 ss_code_to_number

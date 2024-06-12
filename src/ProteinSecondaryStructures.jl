@@ -17,6 +17,7 @@ export class
 export ss_composition
 export ss_code_to_number
 export ss_number_to_code
+export ss_classes
 
 export ss_content
 export ss_map
@@ -68,7 +69,13 @@ include("./stride.jl")
 include("./dssp.jl")
 
 # Common interface 
-const classes = Dict{String,String}(
+"""
+    ss_classes
+
+Secondary structure classes dictionary. 
+
+"""
+const ss_classes = Dict{String,String}(
     "G" => "310 helix",
     "H" => "alpha helix",
     "I" => "pi helix",
@@ -178,9 +185,9 @@ The secondary structure classes are:
 | `"loop"`            | `" "`        | `10`         |
 
 """
-class(ss::SSData) = classes[ss.sscode]
-class(code_number::Int) = classes[number_to_code[code_number]]
-class(sscode::Union{Char,String}) = classes[string(sscode)]
+class(ss::SSData) = ss_classes[ss.sscode]
+class(code_number::Int) = ss_classes[number_to_code[code_number]]
+class(sscode::Union{Char,String}) = ss_classes[string(sscode)]
 
 """
     is_anyhelix(ss::SSData)
@@ -223,7 +230,7 @@ the secondary structure types and their counts.
 """
 function ss_composition(data::AbstractVector{<:SSData})
     sscomposition = Dict{String,Int}()
-    for sscode in keys(classes)
+    for sscode in keys(ss_classes)
         sscomposition[class(sscode)] = count(ss -> ss.sscode == sscode, data)
     end
     return sscomposition
