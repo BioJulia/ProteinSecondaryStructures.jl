@@ -25,7 +25,7 @@ end
     end
 end
 
-@testiem "ss_code_to_number/ss_number_to_code" begin
+@testitem "ss_code_to_number/ss_number_to_code" begin
     @test ss_code_to_number('H') == 2
     @test ss_code_to_number("H") == 2
     @test ss_code_to_number.(split("H B")) == [2, 7]
