@@ -105,7 +105,7 @@ const number_to_code = Dict{Int,String}(
 )
 
 """
-    ss_code_to_number(code::Union{String,Char})
+    ss_code_to_number(code::Union{AbstractString,AbstractChar})
 
 Converts secondary structure codes to code integer numbers, which 
 might be useful for generating secondary structure plots.
@@ -133,7 +133,7 @@ julia> class(7)
     This function was added in version 1.1.0
 
 """
-ss_code_to_number(code::Union{Char,String}) = code_to_number[string(code)]
+ss_code_to_number(code::Union{AbstractString,AbstractChar}) = code_to_number[string(code)]
 
 """
     ss_number_to_code(code::Integer)
@@ -187,7 +187,7 @@ The secondary structure classes are:
 """
 class(ss::SSData) = ss_classes[ss.sscode]
 class(code_number::Int) = ss_classes[number_to_code[code_number]]
-class(sscode::Union{Char,String}) = ss_classes[string(sscode)]
+class(sscode::Union{AbstractString,AbstractChar}) = ss_classes[string(sscode)]
 
 """
     is_anyhelix(ss::SSData)
