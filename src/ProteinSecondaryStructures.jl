@@ -184,6 +184,24 @@ The secondary structure classes are:
 | `"coil"`            | `"C"`        | `9`          |
 | `"loop"`            | `" "`        | `10`         |
 
+## Example
+
+```jldoctest
+julia> using ProteinSecondaryStructures
+
+julia> class("H")
+"alpha helix"
+
+julia> class(1)
+"310 helix"
+
+julia> ss = SSData("ARG", "A", 1, "H", 0.0, 0.0, 0.0, 0.0, 0.0)
+SSData("ARG", "A", 1, "H", 0.0, 0.0, 0.0, 0.0, 0.0)
+
+julia> class(ss)
+"alpha helix"
+```
+
 """
 class(ss::SSData) = ss_classes[ss.sscode]
 class(code_number::Int) = ss_classes[number_to_code[code_number]]
