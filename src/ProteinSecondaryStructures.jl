@@ -65,14 +65,16 @@ residues_match(ss1::SSData, ss2::SSData) =
     ss1.resname == ss2.resname && ss1.chain == ss2.chain && ss1.resnum == ss2.resnum
 
 # Initialize an array of SSData elements, one for each residue in the pdb file
-function init_ssvector(pdbfile::AbstractString)
+function init_ssvector(pdbfile::AbstractString; empty_chain_identifier::String)
     ssvector = SSData[]
     open(pdbfile, "r") do io
         for line in eachline(io)
             if startswith(line, "ATOM")
                 resname = string(strip(line[18:20]))
                 chain = line[22:22]
-                chain = chain == ' ' ? "X" : chain
+                if chain == " "
+                    chain = empty_chain_identifier
+                end
                 resnum = parse(Int, line[23:26])
                 ssdata = SSData(resname, chain, resnum)
                 if findfirst(ss -> residues_match(ss, ssdata), ssvector) === nothing

@@ -78,7 +78,7 @@ function dssp_run(pdbfile::AbstractString; adjust_pdb=true)
     else
         pdbfile
     end
-    ssvector = init_ssvector(pdbfile)
+    ssvector = init_ssvector(pdbfile; empty_chain_identifier="X")
     # Run dssp on the pdb file
     dssp_raw_data = try
         readchomp(pipeline(`$dssp_executable --output-format dssp $pdbfile`))

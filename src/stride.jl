@@ -36,10 +36,10 @@ function stride_run(pdbfile::AbstractString; adjust_pdb=true)
         open(tmp_file, "w") do io
             println(io, stride_pdb_header())
             for line in readlines(pdbfile)
-                if startswith(line, "ATOM") println(io, line)
+                if startswith(line, "ATOM")
                     # STRIDE uses '-' as the empty chain identifier
                     if line[22] == ' '
-                        line = line[1:21]*'X'*line[23:end]
+                        line = line[1:21]*'-'*line[23:end]
                     end
                     println(io, line)
                 end
@@ -49,7 +49,7 @@ function stride_run(pdbfile::AbstractString; adjust_pdb=true)
     else
         pdbfile
     end
-    ssvector = init_ssvector(pdbfile)
+    ssvector = init_ssvector(pdbfile; empty_chain_identifier="-")
     # Run stride on the pdb file
     stride_raw_data = try
         readchomp(pipeline(`$stride_executable $pdbfile`))
