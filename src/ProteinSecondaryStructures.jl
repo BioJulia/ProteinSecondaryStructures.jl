@@ -13,7 +13,7 @@ export dssp_run
 export is_anyhelix, is_alphahelix, is_pihelix, is_310helix, is_kappahelix
 export is_anystrand, is_betastrand, is_betabridge
 export is_bend, is_coil, is_turn, is_loop
-export class
+export ss_name, class # class will be deprecated in 2.0
 export ss_composition
 export ss_code_to_number
 export ss_number_to_code
@@ -125,7 +125,7 @@ julia> ss_code_to_number("H")
 julia> ss_code_to_number('B')
 7
 
-julia> class(7)
+julia> ss_name(7)
 "beta bridge"
 ```
 
@@ -163,15 +163,15 @@ julia> ss_number_to_code(7)
 ss_number_to_code(code::Integer) = number_to_code[code]
 
 """
-    class(ss::Union{SSData, SSData, Integer, String, Char})
+    ss_name(ss::Union{SSData, SSData, Integer, String, Char})
 
-Return the secondary structure class. The input may be a `SSData` object, 
+Return the secondary structure name. The input may be a `SSData` object, 
 a secondary structure `Integer` code (1-8) or a secondary 
 structure code (`G, H, ..., C`).
 
-The secondary structure classes are:
+The secondary structure classes names and codes are:
 
-| Secondary structure | `ss code`    | `code number`|
+| SS name             | `ss code`    | `code number`|
 |:--------------------|:------------:|:------------:|
 | `"310 helix"`       | `"G"`        | `1`          | 
 | `"alpha helix"`     | `"H"`        | `2`          |
@@ -189,23 +189,26 @@ The secondary structure classes are:
 ```jldoctest
 julia> using ProteinSecondaryStructures
 
-julia> class("H")
+julia> ss_name("H")
 "alpha helix"
 
-julia> class(1)
+julia> ss_name(1)
 "310 helix"
 
 julia> ss = SSData("ARG", "A", 1, "H", 0.0, 0.0, 0.0, 0.0, 0.0)
 SSData("ARG", "A", 1, "H", 0.0, 0.0, 0.0, 0.0, 0.0)
 
-julia> class(ss)
+julia> ss_name(ss)
 "alpha helix"
 ```
 
 """
-class(ss::SSData) = ss_classes[ss.sscode]
-class(code_number::Int) = ss_classes[number_to_code[code_number]]
-class(sscode::Union{AbstractString,AbstractChar}) = ss_classes[string(sscode)]
+ss_name(ss::SSData) = ss_classes[ss.sscode]
+ss_name(code_number::Int) = ss_classes[number_to_code[code_number]]
+ss_name(sscode::Union{AbstractString,AbstractChar}) = ss_classes[string(sscode)]
+
+# will be deprecated in 2.0
+const class = ss_name
 
 """
     is_anyhelix(ss::SSData)
@@ -249,7 +252,7 @@ the secondary structure types and their counts.
 function ss_composition(data::AbstractVector{<:SSData})
     sscomposition = Dict{String,Int}()
     for sscode in keys(ss_classes)
-        sscomposition[class(sscode)] = count(ss -> ss.sscode == sscode, data)
+        sscomposition[ss_name(sscode)] = count(ss -> ss.sscode == sscode, data)
     end
     return sscomposition
 end

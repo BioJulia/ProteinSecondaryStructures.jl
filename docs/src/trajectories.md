@@ -113,7 +113,7 @@ Dict{String, Int64} with 10 entries:
 These functions are useful, because the computation of the secondary structure along the
 trajectory (the map) can be costly.
 
-### Single class, througout the trajectory
+### Single class, along the trajectory
 
 If the user wants to compute the content of a single class of secondary structures
 along a trajectory, that can be done without precomputing the secondary structure map

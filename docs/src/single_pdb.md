@@ -62,15 +62,15 @@ julia> comp["alpha helix"]
 
 The output is a dictionary containing the number of residues that were classified in each class. As shown above, this number can be retrieved individually.
 
-## Retrieving classes
+## Retrieving secondary structure names
 
-The class of secondary structure of each residue can be retrived with the `class` function:
+The name of the secondary structure of each residue can be retrieved with the `ss_name` function:
 
 ```julia
 julia> ss[10]
 SSData("ASP", "A", 10, "T", -53.61, 124.03, 78.7, 0.0, 0.0)
 
-julia> class(ss[10])
+julia> ss_name(ss[10])
 "turn"
 ```
 

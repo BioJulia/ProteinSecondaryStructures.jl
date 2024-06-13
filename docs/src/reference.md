@@ -13,10 +13,10 @@ SSData
 ## Class retriever functions
 
 ```@docs
-class
 ss_classes
 ProteinSecondaryStructures._is_class
 ss_composition
+ss_name
 ss_code_to_number
 ss_number_to_code
 ```

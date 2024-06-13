@@ -155,7 +155,7 @@ function ss_composition(ssmap::AbstractMatrix{Int}, iframe::Int)
     sscomposition = Dict{String,Int}()
     sscodes = @view(ssmap[:, iframe])
     for sscode in keys(number_to_code)
-        sscomposition[class(sscode)] = count(==(sscode), sscodes)
+        sscomposition[ss_name(sscode)] = count(==(sscode), sscodes)
     end
     return sscomposition
 end

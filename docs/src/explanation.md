@@ -23,7 +23,7 @@ defined through the interface with the `PDBTools` package.
 
 The output of STRIDE or DSSP follow the convention of secondary strucure codes, which are:
 
-| Secondary structure | `ss code`    |`code number` |
+| SS name             | `ss code`    |`code number` |
 |---------------------|:------------:|:------------:|
 | `"310 helix"`       | `"G"`        | `1`          | 
 | `"alpha helix"`     | `"H"`        | `2`          |
@@ -72,7 +72,7 @@ SSData("MET", "A", 1, "C", 360.0, 150.62, 234.4, 0.0, 0.0)
 julia> ss[1].sscode
 "C"
 
-julia> class(ss[1].sscode)
+julia> ss_name(ss[1].sscode)
 "coil"
 ```
 
