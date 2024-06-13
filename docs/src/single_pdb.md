@@ -1,5 +1,9 @@
 # Single PDB files
 
+```@meta
+CollapsedDocStrings = true
+```
+
 ## Compute secondary structures
 
 First, install the package, according to the [Installation](@ref) instructions.
@@ -62,16 +66,36 @@ julia> comp["alpha helix"]
 
 The output is a dictionary containing the number of residues that were classified in each class. As shown above, this number can be retrieved individually.
 
-## Retrieving secondary structure names
+## Retrieving names, codes, and numeric codes
 
-The name of the secondary structure of each residue can be retrieved with the `ss_name` function:
+The name, single-character codes, or numeric codes of the secondary structure of each residue can be retrieved with the `ss_name`, `ss_code`,
+and `ss_number` functions. The input of these functions can be an instance of `SSData` or one of the other two secondary structure
+classification types (name, code, or number): 
 
-```julia
-julia> ss[10]
-SSData("ASP", "A", 10, "T", -53.61, 124.03, 78.7, 0.0, 0.0)
+```@docs
+ss_name
+ss_code
+ss_number
+```
 
-julia> ss_name(ss[10])
-"turn"
+These functions can be used to obtain arrays of codes, by broadcasting over the
+vector of secondary structure data. For example:
+
+```jldoctest
+julia> using ProteinSecondaryStructures
+
+julia> using ProteinSecondaryStructures.Testing: examples
+
+julia> ss = stride_run(examples[1].filename);
+
+julia> ss_name.(ss)[1:5]
+5-element Vector{String}:
+ "coil"
+ "coil"
+ "coil"
+ "310 helix"
+ "310 helix"
+
 ```
 
 And helper functions are available to obtain boolean vectors to check if each residue belong to some class. For example:

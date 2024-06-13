@@ -9,10 +9,6 @@ export SSData
 
 export stride_run
 export dssp_run
-
-export is_anyhelix, is_alphahelix, is_pihelix, is_310helix, is_kappahelix
-export is_anystrand, is_betastrand, is_betabridge
-export is_bend, is_coil, is_turn, is_loop
 export ss_composition
 
 # Representation conversion functions
@@ -42,23 +38,30 @@ A struct to hold secondary structure data for a single residue. The fields are:
     resname::String
     chain::String
     resnum::Int
-    sscode::String # as String because Char is `show`n uglier
+    sscode::String # as String for good reasons*
     phi::Float64
     psi::Float64
     area::Float64 = 0.0 # stride specific
     kappa::Float64 = 0.0 # dssp specific
     alpha::Float64 = 0.0 # dssp specific
 end
+#=
+*We don´t want the user to have an error if initializing this code
+with a singe-character string, or using any of the other functions,
+like `ss_name` with a one-character string. It is easier just
+to support strings here and convert characters to strings when 
+needed. Also, the Char type is printed in a too-technical way. 
+And, finally, we may want to add more secondary structure types
+represented by more than one character in the future.
+=#
 
 # Constructor for SSData from residue data only 
-function SSData(resname::String, chain::String, resnum::Int)
-    return SSData(resname, chain, resnum, " ", 0.0, 0.0, 0.0, 0.0, 0.0)
-end
+SSData(resname::String, chain::String, resnum::Int) =
+    SSData(resname, chain, resnum, " ", 0.0, 0.0, 0.0, 0.0, 0.0)
 
 # Check if two residues are the same given the SSData fields
-function residues_match(ss1::SSData, ss2::SSData)
-    return ss1.resname == ss2.resname && ss1.chain == ss2.chain && ss1.resnum == ss2.resnum
-end
+residues_match(ss1::SSData, ss2::SSData) =
+    ss1.resname == ss2.resname && ss1.chain == ss2.chain && ss1.resnum == ss2.resnum
 
 # Stride interface
 include("./stride.jl")
@@ -108,9 +111,8 @@ Returns the secondary structure number code. The input may be a
 secondary structure `String` code, a secondary structure name
 (`"310 helix"`, `"alpha helix"`, ..., `"coil"`), or a `SSData` object.
 
-The classification follows the DSSP standard classes:
-
-https://m3g.github.io/ProteinSecondaryStructures.jl/stable/explanation/#Secondary-structure-classes
+The classification follows the DSSP standard classes, described 
+in the ProteinSecondaryStructures.jl documentation.
 
 # Example
 
@@ -126,7 +128,7 @@ julia> ss_number('B')
 julia> ss_number("beta bridge")
 7
 
-julia> ss = SSData("ARG", "A", 1, "H", 0.0, 0.0, 0.0, 0.0, 0.0);
+julia> ss = SSData("ARG", "A", 1, "H", 0.0, 0.0, 0.0, 0.0, 0.0)
 SSData("ARG", "A", 1, "H", 0.0, 0.0, 0.0, 0.0, 0.0)
 
 julia> ss_number(ss)
@@ -156,15 +158,14 @@ end
 end
 
 """
-    ss_code(code::Union{String,Integer,SSData})
+    ss_code(code::Union{SSData,String,Integer})
 
 Returns the one-letter secondary structure code. The input may be a
 secondary structure `Integer` code, a secondary structure name
 (`"310 helix"`, `"alpha helix"`, ..., `"coil"`), or a `SSData` object.
 
-The classification follows the DSSP standard classes:
-
-https://m3g.github.io/ProteinSecondaryStructures.jl/stable/explanation/#Secondary-structure-classes
+The classification follows the DSSP standard classes, described 
+in the ProteinSecondaryStructures.jl documentation.
 
 # Example
 
@@ -206,20 +207,8 @@ Return the secondary structure name. The input may be a `SSData` object,
 a secondary structure `Integer` code (1-8) or a secondary 
 structure code (`G, H, ..., C`).
 
-The secondary structure classes names and codes are:
-
-| SS name             | `ss code`    | `code number`|
-|:--------------------|:------------:|:------------:|
-| `"310 helix"`       | `"G"`        | `1`          | 
-| `"alpha helix"`     | `"H"`        | `2`          |
-| `"pi helix"`        | `"I"`        | `3`          |
-| `"kappa helix"`     | `"P"`        | `4`          |
-| `"turn"`            | `"T"`        | `5`          |
-| `"beta strand"`     | `"E"`        | `6`          |
-| `"beta bridge"`     | `"B"`        | `7`          |
-| `"bend"`            | `"S"`        | `8`          |
-| `"coil"`            | `"C"`        | `9`          |
-| `"loop"`            | `" "`        | `10`         |
+The classification follows the DSSP standard classes, described 
+in the ProteinSecondaryStructures.jl documentation.
 
 ## Example
 
@@ -243,38 +232,6 @@ julia> ss_name(ss)
 ss_name(ss::SSData) = ss_classes[ss.sscode]
 ss_name(code_number::Int) = ss_classes[number_to_code[code_number]]
 ss_name(sscode::Union{AbstractString,AbstractChar}) = ss_classes[string(sscode)]
-
-"""
-    is_anyhelix(ss::SSData)
-    is_alphahelix(ss::SSData)
-    is_pihelix(ss::SSData)
-    is_kappahelix(ss::SSData)
-    is_310helix(ss::SSData)
-    is_anystrand(ss::SSData)
-    is_betastrand(ss::SSData)
-    is_betabridge(ss::SSData)
-    is_turn(ss::SSData)
-    is_bend(ss::SSData)
-    is_coil(ss::SSData)
-    is_turn(ss::SSData)
-
-Return `true` if the data is of the given secondary structure type.
-
-"""
-function _is_class end
-
-@doc (@doc _is_class) is_anyhelix(ss::SSData) = ss.sscode in ("H", "G", "I", "P")
-@doc (@doc _is_class) is_alphahelix(ss::SSData) = ss.sscode == "H"
-@doc (@doc _is_class) is_pihelix(ss::SSData) = ss.sscode == "I"
-@doc (@doc _is_class) is_kappahelix(ss::SSData) = ss.sscode == "P"
-@doc (@doc _is_class) is_310helix(ss::SSData) = ss.sscode == "G"
-@doc (@doc _is_class) is_anystrand(ss::SSData) = ss.sscode in ("E", "B")
-@doc (@doc _is_class) is_betastrand(ss::SSData) = ss.sscode == "E"
-@doc (@doc _is_class) is_betabridge(ss::SSData) = ss.sscode == "B"
-@doc (@doc _is_class) is_turn(ss::SSData) = ss.sscode == "T"
-@doc (@doc _is_class) is_bend(ss::SSData) = ss.sscode == "S"
-@doc (@doc _is_class) is_coil(ss::SSData) = ss.sscode == "C"
-@doc (@doc _is_class) is_loop(ss::SSData) = ss.sscode == " "
 
 """
     ss_composition(data::AbstractVector{<:SSData})
@@ -315,6 +272,41 @@ export ss_map
     @test ss_number_to_code(2) == "H"
     @test ss_number_to_code(Int32(2)) == "H"
 end
+
+export is_anyhelix, is_alphahelix, is_pihelix, is_310helix, is_kappahelix
+export is_anystrand, is_betastrand, is_betabridge
+export is_bend, is_coil, is_turn, is_loop
+"""
+    is_anyhelix(ss::SSData)
+    is_alphahelix(ss::SSData)
+    is_pihelix(ss::SSData)
+    is_kappahelix(ss::SSData)
+    is_310helix(ss::SSData)
+    is_anystrand(ss::SSData)
+    is_betastrand(ss::SSData)
+    is_betabridge(ss::SSData)
+    is_turn(ss::SSData)
+    is_bend(ss::SSData)
+    is_coil(ss::SSData)
+    is_turn(ss::SSData)
+
+Return `true` if the data is of the given secondary structure type.
+
+"""
+function _is_class end
+
+@doc (@doc _is_class) is_anyhelix(ss::SSData) = ss.sscode in ("H", "G", "I", "P")
+@doc (@doc _is_class) is_alphahelix(ss::SSData) = ss.sscode == "H"
+@doc (@doc _is_class) is_pihelix(ss::SSData) = ss.sscode == "I"
+@doc (@doc _is_class) is_kappahelix(ss::SSData) = ss.sscode == "P"
+@doc (@doc _is_class) is_310helix(ss::SSData) = ss.sscode == "G"
+@doc (@doc _is_class) is_anystrand(ss::SSData) = ss.sscode in ("E", "B")
+@doc (@doc _is_class) is_betastrand(ss::SSData) = ss.sscode == "E"
+@doc (@doc _is_class) is_betabridge(ss::SSData) = ss.sscode == "B"
+@doc (@doc _is_class) is_turn(ss::SSData) = ss.sscode == "T"
+@doc (@doc _is_class) is_bend(ss::SSData) = ss.sscode == "S"
+@doc (@doc _is_class) is_coil(ss::SSData) = ss.sscode == "C"
+@doc (@doc _is_class) is_loop(ss::SSData) = ss.sscode == " "
 
 end # module ProteinSecondaryStructures
 

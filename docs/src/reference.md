@@ -16,9 +16,6 @@ SSData
 ss_classes
 ProteinSecondaryStructures._is_class
 ss_composition
-ss_name
-ss_code
-ss_number
 ```
 
 ## Single-PDB runs
