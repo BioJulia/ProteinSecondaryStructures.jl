@@ -1,32 +1,24 @@
 name = "ProteinSecondaryStructures"
 uuid = "c298f58b-271f-48cb-96ac-5442ca7c67d9"
 authors = ["Leandro Martinez <lmartine@unicamp.br> and contributors"]
-version = "1.5.1-DEV"
+version = "2.0.0-DEV"
 
 [deps]
-Chemfiles = "46823bd8-5fb3-5f92-9aa0-96921f3dd015"
 DSSP_jll = "74334e00-59ce-546d-b517-81f3b7e1d491"
-PDBTools = "e29189f1-7114-4dbd-93d0-c5673a921a58"
-ProgressMeter = "92933f4c-e287-5a05-a399-4b506db050ca"
 STRIDE_jll = "850473c1-9ef0-5df9-a957-757f4cde8b8b"
 TestItems = "1c621080-faea-4a02-84b6-bbd5e436b8fe"
 
 [compat]
 Aqua = "0.6"
-Chemfiles = "0.10"
 DSSP_jll = "= 4.4.0"
-PDBTools = "0.13.14, 0.14, 0.15, 1"
-ProgressMeter = "1.7"
 STRIDE_jll = "1"
 TestItems = "0.1"
 julia = "1.6"
 
 [extras]
 Aqua = "4c88cf16-eb10-579e-8560-4a9242c79595"
-Chemfiles = "46823bd8-5fb3-5f92-9aa0-96921f3dd015"
-PDBTools = "e29189f1-7114-4dbd-93d0-c5673a921a58"
 Test = "8dfed614-e22c-5e08-85e1-65c5234f0b40"
 TestItemRunner = "f8b46487-2199-4994-9208-9a1283c18c0a"
 
 [targets]
-test = ["Aqua", "Test", "Chemfiles", "PDBTools", "TestItemRunner"]
+test = ["Aqua", "Test", "TestItemRunner"]

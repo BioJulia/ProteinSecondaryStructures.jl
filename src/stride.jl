@@ -6,15 +6,17 @@ import STRIDE_jll
 stride_executable = STRIDE_jll.stride_exe()
 
 """
-    stride_run(pdb_file::String; selection="protein")
-    stride_run(atoms::AbstractVector{<:PDBTools.Atom})
+    stride_run(pdb_file::AbstractString; adjust_pdb=true)
 
 Run stride on the pdb file and return a vector containing the `stride` detailed
 secondary structure information for each residue.
 
-When passing a PDB file, by default only the atoms belonging to standard protein residues are considered. This can be changed by
-setting the `selection` keyword argument to a different selection string, or function, following the `PDBTools.jl` syntax.
-Note that `STRIDE` will fail if residue or atoms types not recognized. 
+The `adjust_pdb` option is used to fix the header of the pdb file before running `stride`.
+In this case, only the ATOM lines are kept in the pdb file. If `adjust_pdb=false`, the pdb file
+provided is used as is.
+
+Note that `STRIDE` will fail if residue or atoms types not recognized or if the header
+of the PDB file does not follow the necessary pattern.
 
 """
 function stride_run end
@@ -27,21 +29,33 @@ function stride_pdb_header()
         """)
 end
 
-function stride_run(atoms::AbstractVector{<:PDBTools.Atom}; fix_header=true)
-    tmp_file = tempname() * ".pdb"
+function stride_run(pdbfile::AbstractString; adjust_pdb=true)
     # If the header is not in the correct format, stride will fail
-    if fix_header
-        PDBTools.writePDB(atoms, tmp_file; header=stride_pdb_header(), footer=nothing)
+    pdbfile = if adjust_pdb
+        tmp_file = tempname() * ".pdb"
+        open(tmp_file, "w") do io
+            println(io, stride_pdb_header())
+            for line in readlines(pdbfile)
+                if startswith(line, "ATOM") println(io, line)
+                    # STRIDE uses '-' as the empty chain identifier
+                    if line[22] == ' '
+                        line = line[1:21]*'X'*line[23:end]
+                    end
+                    println(io, line)
+                end
+            end
+        end
+        tmp_file
     else
-        PDBTools.writePDB(atoms, tmp_file)
+        pdbfile
     end
+    ssvector = init_ssvector(pdbfile)
     # Run stride on the pdb file
     stride_raw_data = try
-        readchomp(pipeline(`$stride_executable $tmp_file`))
+        readchomp(pipeline(`$stride_executable $pdbfile`))
     catch
-        "error"
+        "error running stride on $pdbfile"
     end
-    ssvector = [SSData(r.resname, r.chain, r.resnum) for r in PDBTools.eachresidue(atoms)]
     #      ASG    Detailed secondary structure assignment
     #      Format:  6-8  Residue name
     #	      10-10 Protein chain identifier
@@ -52,8 +66,7 @@ function stride_run(atoms::AbstractVector{<:PDBTools.Atom}; fix_header=true)
     #	      43-49 Phi	angle
     #	      53-59 Psi	angle
     #	      65-69 Residue solvent accessible area
-    end_of_line = Sys.iswindows() ? "\r\n" : "\n"
-    for line in split(stride_raw_data, end_of_line)
+    for line in eachline(IOBuffer(stride_raw_data))
         if startswith(line, "ASG")
             ss_residue = SSData(
                 resname=line[6:8],
@@ -70,13 +83,5 @@ function stride_run(atoms::AbstractVector{<:PDBTools.Atom}; fix_header=true)
             end
         end
     end
-    rm(tmp_file)
     return ssvector
 end
-
-# From a PDB file
-function stride_run(pdb_file::String; selection="protein", fix_header=true)
-    atoms = PDBTools.readPDB(pdb_file, selection)
-    return stride_run(atoms; fix_header=fix_header)
-end
-

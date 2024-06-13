@@ -1,14 +1,15 @@
 module ProteinSecondaryStructures
 
 using TestItems: @testitem
-using ProgressMeter: Progress, next!
-import Chemfiles
-import PDBTools
 
+# Basic data structure for each residue
 export SSData
 
+# Secondary structure calculation methods
 export stride_run
 export dssp_run
+
+# Secondary structure summary
 export ss_composition
 
 # Representation conversion functions
@@ -62,6 +63,26 @@ SSData(resname::String, chain::String, resnum::Int) =
 # Check if two residues are the same given the SSData fields
 residues_match(ss1::SSData, ss2::SSData) =
     ss1.resname == ss2.resname && ss1.chain == ss2.chain && ss1.resnum == ss2.resnum
+
+# Initialize an array of SSData elements, one for each residue in the pdb file
+function init_ssvector(pdbfile::AbstractString)
+    ssvector = SSData[]
+    open(pdbfile, "r") do io
+        for line in eachline(io)
+            if startswith(line, "ATOM")
+                resname = string(strip(line[18:20]))
+                chain = line[22:22]
+                chain = chain == ' ' ? "X" : chain
+                resnum = parse(Int, line[23:26])
+                ssdata = SSData(resname, chain, resnum)
+                if findfirst(ss -> residues_match(ss, ssdata), ssvector) === nothing
+                    push!(ssvector, SSData(resname, chain, resnum))
+                end
+            end
+        end
+    end
+    return ssvector
+end
 
 # Stride interface
 include("./stride.jl")
@@ -251,62 +272,4 @@ end
 # Testing module
 include("../test/Testing.jl")
 
-
-#
-# The next will be deprecated in 2.0
-#
-
-# Trajectory analysis
-include("./trajectories.jl")
-const class = ss_name 
-const ss_code_to_number = ss_number
-const ss_number_to_code = ss_code
-export ss_classes
-export class, ss_code_to_number, ss_number_to_code
-export ss_content
-export ss_map
-@testitem "ss_code_to_number/ss_number_to_code" begin
-    @test ss_code_to_number('H') == 2
-    @test ss_code_to_number("H") == 2
-    @test ss_code_to_number.(split("H B")) == [2, 7]
-    @test ss_number_to_code(2) == "H"
-    @test ss_number_to_code(Int32(2)) == "H"
 end
-
-export is_anyhelix, is_alphahelix, is_pihelix, is_310helix, is_kappahelix
-export is_anystrand, is_betastrand, is_betabridge
-export is_bend, is_coil, is_turn, is_loop
-"""
-    is_anyhelix(ss::SSData)
-    is_alphahelix(ss::SSData)
-    is_pihelix(ss::SSData)
-    is_kappahelix(ss::SSData)
-    is_310helix(ss::SSData)
-    is_anystrand(ss::SSData)
-    is_betastrand(ss::SSData)
-    is_betabridge(ss::SSData)
-    is_turn(ss::SSData)
-    is_bend(ss::SSData)
-    is_coil(ss::SSData)
-    is_turn(ss::SSData)
-
-Return `true` if the data is of the given secondary structure type.
-
-"""
-function _is_class end
-
-@doc (@doc _is_class) is_anyhelix(ss::SSData) = ss.sscode in ("H", "G", "I", "P")
-@doc (@doc _is_class) is_alphahelix(ss::SSData) = ss.sscode == "H"
-@doc (@doc _is_class) is_pihelix(ss::SSData) = ss.sscode == "I"
-@doc (@doc _is_class) is_kappahelix(ss::SSData) = ss.sscode == "P"
-@doc (@doc _is_class) is_310helix(ss::SSData) = ss.sscode == "G"
-@doc (@doc _is_class) is_anystrand(ss::SSData) = ss.sscode in ("E", "B")
-@doc (@doc _is_class) is_betastrand(ss::SSData) = ss.sscode == "E"
-@doc (@doc _is_class) is_betabridge(ss::SSData) = ss.sscode == "B"
-@doc (@doc _is_class) is_turn(ss::SSData) = ss.sscode == "T"
-@doc (@doc _is_class) is_bend(ss::SSData) = ss.sscode == "S"
-@doc (@doc _is_class) is_coil(ss::SSData) = ss.sscode == "C"
-@doc (@doc _is_class) is_loop(ss::SSData) = ss.sscode == " "
-
-end # module ProteinSecondaryStructures
-
