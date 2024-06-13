@@ -13,14 +13,12 @@ export dssp_run
 export is_anyhelix, is_alphahelix, is_pihelix, is_310helix, is_kappahelix
 export is_anystrand, is_betastrand, is_betabridge
 export is_bend, is_coil, is_turn, is_loop
-export ss_name, class # class will be deprecated in 2.0
 export ss_composition
-export ss_code_to_number
-export ss_number_to_code
-export ss_classes
 
-export ss_content
-export ss_map
+# Representation conversion functions
+export ss_name
+export ss_code
+export ss_number
 
 import Base: @kwdef # for 1.6 compatibility
 
@@ -87,6 +85,7 @@ const ss_classes = Dict{String,String}(
     "C" => "coil",
     " " => "loop",
 )
+const name_to_code = Dict{String,String}(ss_classes[key] => key for key in keys(ss_classes))
 
 const code_to_number = Dict{String,Int}(
     "G" => 1, # 310 helix
@@ -100,15 +99,14 @@ const code_to_number = Dict{String,Int}(
     "C" => 9, # coil
     " " => 10, # loop
 )
-const number_to_code = Dict{Int,String}(
-    code_to_number[key] => key for key in keys(code_to_number)
-)
+const number_to_code = Dict{Int,String}(code_to_number[key] => key for key in keys(code_to_number))
 
 """
-    ss_code_to_number(code::Union{AbstractString,AbstractChar})
+    ss_number(code::Union{SSData,AbstractString,AbstractChar})
 
-Converts secondary structure codes to code integer numbers, which 
-might be useful for generating secondary structure plots.
+Returns the secondary structure number code. The input may be a
+secondary structure `String` code, a secondary structure name
+(`"310 helix"`, `"alpha helix"`, ..., `"coil"`), or a `SSData` object.
 
 The classification follows the DSSP standard classes:
 
@@ -119,26 +117,50 @@ https://m3g.github.io/ProteinSecondaryStructures.jl/stable/explanation/#Secondar
 ```jldoctest
 julia> using ProteinSecondaryStructures
 
-julia> ss_code_to_number("H")
+julia> ss_number("H")
 2
 
-julia> ss_code_to_number('B')
+julia> ss_number('B')
 7
 
-julia> ss_name(7)
-"beta bridge"
+julia> ss_number("beta bridge")
+7
+
+julia> ss = SSData("ARG", "A", 1, "H", 0.0, 0.0, 0.0, 0.0, 0.0);
+SSData("ARG", "A", 1, "H", 0.0, 0.0, 0.0, 0.0, 0.0)
+
+julia> ss_number(ss)
+2
+
 ```
 
 !!! compat
-    This function was added in version 1.1.0
+    This function was added in version 1.5.0
 
 """
-ss_code_to_number(code::Union{AbstractString,AbstractChar}) = code_to_number[string(code)]
+ss_number(code::SSData) = code_to_number[code.sscode]
+ss_number(code::AbstractChar) = code_to_number[string(code)]
+function ss_number(code::AbstractString) 
+    if length(code) == 1
+        return code_to_number[string(code)]
+    else
+        return code_to_number[name_to_code[code]]
+    end
+end
+
+@testitem "ss_number" begin
+    @test ss_number("H") == 2
+    @test ss_number('B') == 7
+    @test ss_number("beta bridge") == 7
+    @test ss_number(SSData("ARG", "A", 1, "H", 0.0, 0.0, 0.0, 0.0, 0.0)) == 2
+end
 
 """
-    ss_number_to_code(code::Integer)
+    ss_code(code::Union{String,Integer,SSData})
 
-Converts secondary structure integer codes to the corresponding string codes.
+Returns the one-letter secondary structure code. The input may be a
+secondary structure `Integer` code, a secondary structure name
+(`"310 helix"`, `"alpha helix"`, ..., `"coil"`), or a `SSData` object.
 
 The classification follows the DSSP standard classes:
 
@@ -149,21 +171,36 @@ https://m3g.github.io/ProteinSecondaryStructures.jl/stable/explanation/#Secondar
 ```jldoctest
 julia> using ProteinSecondaryStructures
 
-julia> ss_number_to_code(2)
+julia> ss_code(2)
 "H"
 
-julia> ss_number_to_code(7)
+julia> ss_code("beta bridge")
 "B"
+
+julia> ss = SSData("ARG", "A", 1, "H", 0.0, 0.0, 0.0, 0.0, 0.0)
+SSData("ARG", "A", 1, "H", 0.0, 0.0, 0.0, 0.0, 0.0)
+
+julia> ss_code(ss)
+"H"
+
 ```
 
 !!! compat
-    This function was added in version 1.1.0
+    This function was added in version 1.5.0
 
 """
-ss_number_to_code(code::Integer) = number_to_code[code]
+ss_code(code::Integer) = number_to_code[code]
+ss_code(code::AbstractString) = name_to_code[code]
+ss_code(code::SSData) = code.sscode 
+
+@testitem "ss_code" begin
+    @test ss_code(2) == "H"
+    @test ss_code("beta bridge") == "B"
+    @test ss_code(SSData("ARG", "A", 1, "H", 0.0, 0.0, 0.0, 0.0, 0.0)) == "H"
+end
 
 """
-    ss_name(ss::Union{SSData, SSData, Integer, String, Char})
+    ss_name(ss::Union{SSData, Integer, String, Char})
 
 Return the secondary structure name. The input may be a `SSData` object, 
 a secondary structure `Integer` code (1-8) or a secondary 
@@ -206,9 +243,6 @@ julia> ss_name(ss)
 ss_name(ss::SSData) = ss_classes[ss.sscode]
 ss_name(code_number::Int) = ss_classes[number_to_code[code_number]]
 ss_name(sscode::Union{AbstractString,AbstractChar}) = ss_classes[string(sscode)]
-
-# will be deprecated in 2.0
-const class = ss_name
 
 """
     is_anyhelix(ss::SSData)
@@ -257,11 +291,30 @@ function ss_composition(data::AbstractVector{<:SSData})
     return sscomposition
 end
 
-# Trajectory analysis
-include("./trajectories.jl")
-
 # Testing module
 include("../test/Testing.jl")
+
+
+#
+# The next will be deprecated in 2.0
+#
+
+# Trajectory analysis
+include("./trajectories.jl")
+const class = ss_name 
+const ss_code_to_number = ss_number
+const ss_number_to_code = ss_code
+export ss_classes
+export class, ss_code_to_number, ss_number_to_code
+export ss_content
+export ss_map
+@testitem "ss_code_to_number/ss_number_to_code" begin
+    @test ss_code_to_number('H') == 2
+    @test ss_code_to_number("H") == 2
+    @test ss_code_to_number.(split("H B")) == [2, 7]
+    @test ss_number_to_code(2) == "H"
+    @test ss_number_to_code(Int32(2)) == "H"
+end
 
 end # module ProteinSecondaryStructures
 

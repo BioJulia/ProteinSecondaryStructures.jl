@@ -17,8 +17,8 @@ ss_classes
 ProteinSecondaryStructures._is_class
 ss_composition
 ss_name
-ss_code_to_number
-ss_number_to_code
+ss_code
+ss_number
 ```
 
 ## Single-PDB runs
