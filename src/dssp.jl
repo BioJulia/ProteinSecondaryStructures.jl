@@ -5,38 +5,16 @@
 import DSSP_jll
 dssp_executable = `$(DSSP_jll.mkdssp()) --mmcif-dictionary $(DSSP_jll.mmcif_pdbx_dic)`
 
-three_letter_code = Dict{Char,String}(
-    'A' => "ALA",
-    'R' => "ARG",
-    'N' => "ASN",
-    'D' => "ASP",
-    'C' => "CYS",
-    'Q' => "GLN",
-    'E' => "GLU",
-    'G' => "GLY",
-    'H' => "HIS",
-    'I' => "ILE",
-    'L' => "LEU",
-    'K' => "LYS",
-    'M' => "MET",
-    'F' => "PHE",
-    'P' => "PRO",
-    'S' => "SER",
-    'T' => "THR",
-    'W' => "TRP",
-    'Y' => "TYR",
-    'V' => "VAL",
-)
-
 """
-    dssp_run(pdb_file::String; adjust_pdb=true)
+    dssp_run(input_file::String; adjust_pdb=false)
 
-Run DSSP on the pdb file and return a vector containing the detailed
+Run DSSP on the PDB or CIF file provided and return a vector containing the detailed
 secondary structure information for each residue.
 
-The `adjust_pdb` option is used to fix the header of the pdb file before running `dssp`.
+The `adjust_pdb` option is used to fix the header of the pdb file before running `dssp`, 
+which is a common problem for computing the secondary structure from PDB files.
 In this case, only the ATOM lines are kept in the pdb file. If `adjust_pdb=false`, the pdb file
-provided is used as is.
+provided is used as is. 
 
 Note that `DSSP` will fail if residue or atoms types not recognized or if the header
 of the PDB file does not follow the necessary pattern.
@@ -56,48 +34,67 @@ const dssp_header = strip("""
           """)
 const dssp_init_line = "  #  RESIDUE AA STRUCTURE BP1 BP2  ACC     N-H-->O    O-->H-N    N-H-->O    O-->H-N    TCO  KAPPA ALPHA  PHI   PSI    X-CA   Y-CA   Z-CA"
 
-function dssp_run(input_pdb_file::AbstractString; adjust_pdb=true)
+function parse_dssp_output(dssp_output::AbstractString)
+    ss_vector = SSData[]
+    struct_summary_section = false
+    ifield = 0
+    fields = Dict{String,Int}()
+    for line in eachline(IOBuffer(dssp_output))
+        if startswith(line, "_dssp_struct_summary")
+            struct_summary_section = true
+            ifield += 1
+            field_data = strip.(split(line,"."))
+            fields[field_data[end]] = ifield    
+        end
+        if struct_summary_section
+            if !startswith(line, "_dssp_struct_summary")
+                if line[1] == '#' 
+                    break
+                end
+                data = split(line)
+                chain = data[fields["label_asym_id"]] 
+                if chain == "."
+                    chain = " "
+                end
+                sscode=data[fields["secondary_structure"]]
+                if sscode == "."
+                    sscode = " "
+                end
+                phi = tryparse(Float64, data[fields["phi"]])
+                psi = tryparse(Float64, data[fields["psi"]])
+                kappa = tryparse(Float64, data[fields["kappa"]])
+                alpha = tryparse(Float64, data[fields["alpha"]])
+                ss_residue = SSData(
+                    resname=data[fields["label_comp_id"]],
+                    chain=data[fields["label_asym_id"]],
+                    resnum=parse(Int, data[fields["label_seq_id"]]),
+                    sscode=sscode,
+                    phi=isnothing(phi) ? 0.0 : phi,
+                    psi=isnothing(psi) ? 0.0 : psi,
+                    kappa=isnothing(kappa) ? 0.0 : kappa,
+                    alpha=isnothing(alpha) ? 0.0 : alpha,
+                )
+                push!(ss_vector, ss_residue)
+            end
+        end
+    end
+    return ss_vector
+end
+
+function dssp_run(input_file::AbstractString; adjust_pdb=false)
     # if the header is not in the correct format, dssp will fail
-    pdb_file = if adjust_pdb
-        adjust_pdb_file(input_pdb_file; header=dssp_header, empty_chain_identifier="X")
+    structure_file = if adjust_pdb
+        adjust_pdb_file(input_file; header=dssp_header, empty_chain_identifier="X")
     else
-        input_pdb_file
+        input_file
     end
-    ssvector = init_ssvector(pdb_file; empty_chain_identifier="X")
-    # Run dssp on the pdb file
-    dssp_raw_data = try
-        readchomp(pipeline(`$dssp_executable --output-format dssp $pdb_file`))
+    # Run dssp
+    dssp_output = try
+        readchomp(pipeline(`$dssp_executable --output-format mmcif $structure_file`))
     catch
-        "error executing dssp on $pdb_file"
+        "error executing dssp on $input_file"
     end
-    isnothing(dssp_raw_data) && return ssvector
-    data_begin = false
-    for line in eachline(IOBuffer(dssp_raw_data))
-        if line == dssp_init_line
-            data_begin = true
-            continue
-        end
-        !data_begin && continue
-        line[14] == '!' && continue
-        chain = line[12]
-        if chain == 'X'
-            chain = ' '
-        end
-        ss_residue = SSData(
-            resname=three_letter_code[line[14]],
-            chain=string(chain),
-            resnum=parse(Int, line[6:10]),
-            sscode=string(line[17]),
-            phi=parse(Float64, line[104:109]),
-            psi=parse(Float64, line[110:115]),
-            kappa=parse(Float64, line[92:97]),
-            alpha=parse(Float64, line[98:103]),
-        )
-        iss = findfirst(ss -> residues_match(ss_residue, ss), ssvector)
-        if !isnothing(iss)
-            ssvector[iss] = ss_residue
-        end
-    end
-    adjust_pdb && rm(pdb_file)
-    return ssvector
+    ss_vector = parse_dssp_output(dssp_output)
+    adjust_pdb && rm(structure_file)
+    return ss_vector
 end
