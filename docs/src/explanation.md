@@ -52,7 +52,7 @@ julia> pdbfile = ProteinSecondaryStructures.Testing.examples[1].filename;
 julia> ss = stride_run(pdbfile);
 
 julia> ss[1]
-SSData("MET", "A", 1, "C", 360.0, 150.620)
+SSData("MET", "A", 1, "C", 360.0, 150.62)
 
 julia> ss[1].sscode
 "C"
