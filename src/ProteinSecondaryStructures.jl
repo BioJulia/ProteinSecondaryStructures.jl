@@ -202,7 +202,7 @@ end
     ss_name(ss::Union{SSData, Integer, String, Char})
 
 Return the secondary structure name. The input may be a `SSData` object, 
-a secondary structure `Integer` code (1-8) or a secondary 
+a secondary structure `Integer` code (1-10) or a secondary 
 structure code (`G, H, ..., C`).
 
 The classification follows the DSSP standard classes, described 
