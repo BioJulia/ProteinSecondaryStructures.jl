@@ -17,8 +17,6 @@ export ss_name
 export ss_code
 export ss_number
 
-import Base: @kwdef # for 1.6 compatibility
-
 """
     SSData
 
@@ -30,21 +28,15 @@ A struct to hold secondary structure data for a single residue. The fields are:
 * `sscode::String` - secondary structure code
 * `phi::Float64` - phi dihedral angle
 * `psi::Float64` - psi dihedral angle
-* `area::Float64` - solvent accessible area (stride specific)
-* `kappa::Float64` - virtual bond angle (dssp specific)
-* `alpha::Float64` - virtual torsion angle (dssp specific)
 
 """
-@kwdef struct SSData
+struct SSData
     resname::String
     chain::String
     resnum::Int
     sscode::String # as String for good reasons*
     phi::Float64
     psi::Float64
-    area::Float64 = 0.0 # stride specific
-    kappa::Float64 = 0.0 # dssp specific
-    alpha::Float64 = 0.0 # dssp specific
 end
 #=
 *We don´t want the user to have an error if initializing this code
@@ -55,10 +47,6 @@ needed. Also, the Char type is printed in a too-technical way.
 And, finally, we may want to add more secondary structure types
 represented by more than one character in the future.
 =#
-
-# Constructor for SSData from residue data only 
-SSData(resname::String, chain::String, resnum::Int) =
-    SSData(resname, chain, resnum, " ", 0.0, 0.0, 0.0, 0.0, 0.0)
 
 # Add proper header and empty chain identifier to the pdb file,
 # for each secondary structure calculation method
@@ -144,8 +132,8 @@ julia> ss_number('B')
 julia> ss_number("beta bridge")
 7
 
-julia> ss = SSData("ARG", "A", 1, "H", 0.0, 0.0, 0.0, 0.0, 0.0)
-SSData("ARG", "A", 1, "H", 0.0, 0.0, 0.0, 0.0, 0.0)
+julia> ss = SSData("ARG", "A", 1, "H", 0.0, 0.0)
+SSData("ARG", "A", 1, "H", 0.0, 0.0)
 
 julia> ss_number(ss)
 2
@@ -170,7 +158,7 @@ end
     @test ss_number("H") == 2
     @test ss_number('B') == 7
     @test ss_number("beta bridge") == 7
-    @test ss_number(SSData("ARG", "A", 1, "H", 0.0, 0.0, 0.0, 0.0, 0.0)) == 2
+    @test ss_number(SSData("ARG", "A", 1, "H", 0.0, 0.0)) == 2
 end
 
 """
@@ -194,8 +182,8 @@ julia> ss_code(2)
 julia> ss_code("beta bridge")
 "B"
 
-julia> ss = SSData("ARG", "A", 1, "H", 0.0, 0.0, 0.0, 0.0, 0.0)
-SSData("ARG", "A", 1, "H", 0.0, 0.0, 0.0, 0.0, 0.0)
+julia> ss = SSData("ARG", "A", 1, "H", 0.0, 0.0)
+SSData("ARG", "A", 1, "H", 0.0, 0.0)
 
 julia> ss_code(ss)
 "H"
@@ -213,7 +201,7 @@ ss_code(code::SSData) = code.sscode
 @testitem "ss_code" begin
     @test ss_code(2) == "H"
     @test ss_code("beta bridge") == "B"
-    @test ss_code(SSData("ARG", "A", 1, "H", 0.0, 0.0, 0.0, 0.0, 0.0)) == "H"
+    @test ss_code(SSData("ARG", "A", 1, "H", 0.0, 0.0)) == "H"
 end
 
 """
@@ -237,8 +225,8 @@ julia> ss_name("H")
 julia> ss_name(1)
 "310 helix"
 
-julia> ss = SSData("ARG", "A", 1, "H", 0.0, 0.0, 0.0, 0.0, 0.0)
-SSData("ARG", "A", 1, "H", 0.0, 0.0, 0.0, 0.0, 0.0)
+julia> ss = SSData("ARG", "A", 1, "H", 0.0, 0.0)
+SSData("ARG", "A", 1, "H", 0.0, 0.0)
 
 julia> ss_name(ss)
 "alpha helix"

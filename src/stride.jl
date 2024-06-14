@@ -8,22 +8,20 @@ stride_executable = STRIDE_jll.stride_exe()
 """
     stride_run(pdb_file::AbstractString; adjust_pdb=false)
 
-Run stride on the pdb file and return a vector containing the `stride` detailed
+Run stride on the PDB file and return a vector containing the `stride` detailed
 secondary structure information for each residue.
 
-The `adjust_pdb` option is used to adjust the format of the pdb file before running `stride`,
-which requires a specific header and a specific empty-chain identifier. 
-In this case, only the ATOM lines are kept in the pdb file. If `adjust_pdb=false`, the pdb file
-provided is used as is.
+- `adjust_pdb=true` is used to adjust the format of the PDB file before running `stride`,
+   which requires a specific header and a specific empty-chain identifier. 
+   In this case, only the ATOM lines are kept in the PDB file. 
+- If `adjust_pdb=false`, the PDB file provided is used as is.
 
 Note that `STRIDE` will fail if residue or atoms types not recognized or if the header
 of the PDB file does not follow the necessary pattern.
 
-STRIDE does not support CIF files.
-
 !!! note 
-    STRIDE might ignore some residues in the PDB file if they are not recognized,
-    or incomplete. 
+    - STRIDE might ignore some residues in the PDB file if they are not recognized, or incomplete. 
+    - STRIDE does not support structures in mmCIF format.
 
 """
 function stride_run end
@@ -49,17 +47,14 @@ function parse_stride_output(stride_output::AbstractString)
     for line in eachline(IOBuffer(stride_output))
         if startswith(line, "ASG")
             chain = line[10]
-            if chain == '-'
-                chain = ' '
-            end
+            chain = chain == '-' ? ' ' : chain
             ss_residue = SSData(
-                resname=line[6:8],
-                chain=string(chain),
-                resnum=parse(Int, line[12:15]),
-                sscode=string(uppercase(line[25])), # stride sometimes returns "b" instead of "B"
-                phi=parse(Float64, line[43:49]),
-                psi=parse(Float64, line[53:59]),
-                area=parse(Float64, line[65:69])
+                line[6:8], # resname
+                string(chain), # chain
+                parse(Int, line[12:15]), # resnum
+                string(uppercase(line[25])), # sscode: stride sometimes returns "b" instead of "B"
+                parse(Float64, line[43:49]), # phi
+                parse(Float64, line[53:59]), # psi
             )
             push!(ss_vector, ss_residue)
         end

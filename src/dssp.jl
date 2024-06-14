@@ -8,13 +8,14 @@ dssp_executable = `$(DSSP_jll.mkdssp()) --mmcif-dictionary $(DSSP_jll.mmcif_pdbx
 """
     dssp_run(input_file::String; adjust_pdb=false)
 
-Run DSSP on the PDB or CIF file provided and return a vector containing the detailed
+Run DSSP on the PDB or mmCIF file provided and return a vector containing the detailed
 secondary structure information for each residue.
 
-The `adjust_pdb` option is used to fix the header of the pdb file before running `dssp`, 
-which is a common problem for computing the secondary structure from PDB files.
-In this case, only the ATOM lines are kept in the pdb file. If `adjust_pdb=false`, the pdb file
-provided is used as is. 
+- `adjust_pdb` option is used to fix the header of PDB files before running `dssp`, 
+   which is a common problem for computing the secondary structure from PDB files.
+   In this case, only the ATOM lines are kept in the pdb file. 
+- `adjust_pdb=false`, the PDB file provided is used as is. This (default) option must be used
+   when the input file is in mmCIF format.
 
 Note that `DSSP` will fail if residue or atoms types not recognized or if the header
 of the PDB file does not follow the necessary pattern.
@@ -52,26 +53,18 @@ function parse_dssp_output(dssp_output::AbstractString)
                 end
                 data = split(line)
                 chain = data[fields["label_asym_id"]] 
-                if chain == "."
-                    chain = " "
-                end
+                chain = chain == "." ? " " : chain
                 sscode=data[fields["secondary_structure"]]
-                if sscode == "."
-                    sscode = " "
-                end
+                sscode = sscode == "." ? " " : sscode
                 phi = tryparse(Float64, data[fields["phi"]])
                 psi = tryparse(Float64, data[fields["psi"]])
-                kappa = tryparse(Float64, data[fields["kappa"]])
-                alpha = tryparse(Float64, data[fields["alpha"]])
                 ss_residue = SSData(
-                    resname=data[fields["label_comp_id"]],
-                    chain=data[fields["label_asym_id"]],
-                    resnum=parse(Int, data[fields["label_seq_id"]]),
-                    sscode=sscode,
-                    phi=isnothing(phi) ? 0.0 : phi,
-                    psi=isnothing(psi) ? 0.0 : psi,
-                    kappa=isnothing(kappa) ? 0.0 : kappa,
-                    alpha=isnothing(alpha) ? 0.0 : alpha,
+                    data[fields["label_comp_id"]], # resname
+                    data[fields["label_asym_id"]], # chain
+                    parse(Int, data[fields["label_seq_id"]]), # resnum
+                    sscode,
+                    isnothing(phi) ? 0.0 : phi,
+                    isnothing(psi) ? 0.0 : psi,
                 )
                 push!(ss_vector, ss_residue)
             end

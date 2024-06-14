@@ -30,9 +30,6 @@ The outputs of STRIDE or DSSP follow the convention of secondary strucure codes,
 
 See the [DSSP secondary structure classification](https://pdb-redo.eu/dssp/about) for further information.
 
-The `code number` are used here to output the matrices of secondary structures obtained
-from trajectory runs. 
-
 ## Data structure
 
 The outputs of the secondary structure calculations are vectors of `SSData` elements, with the following data, for each residue:
@@ -44,8 +41,6 @@ The outputs of the secondary structure calculations are vectors of `SSData` elem
 * `phi::Float64` - phi dihedral angle
 * `psi::Float64` - psi dihedral angle
 * `area::Float64` - solvent accessible area (stride specific)
-* `kappa::Float64` - virtual bond angle (dssp specific)
-* `alpha::Float64` - virtual torsion angle (dssp specific)
 
 For example: 
 
@@ -57,7 +52,7 @@ julia> pdbfile = ProteinSecondaryStructures.Testing.examples[1].filename;
 julia> ss = stride_run(pdbfile);
 
 julia> ss[1]
-SSData("MET", "A", 1, "C", 360.0, 150.62, 234.4, 0.0, 0.0)
+SSData("MET", "A", 1, "C", 360.0, 150.620)
 
 julia> ss[1].sscode
 "C"
