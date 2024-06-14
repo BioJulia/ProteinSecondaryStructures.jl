@@ -12,7 +12,7 @@ julia> import Pkg; Pkg.add("ProteinSecondaryStructures")
 
 There is no need to independently install STRIDE or DSSP.
 
-# Citation
+# References
 
 If you use the `STRIDE` algorithm for secondary structure prediction, please cite:
 

@@ -6,7 +6,10 @@ CollapsedDocStrings = true
 
 ## Overview
 
-This package uses STRIDE or DSSP to compute secondary structures of proteins from their PDB files.
+This package uses STRIDE or DSSP to compute secondary structures of proteins from their structure files:
+
+- STRIDE supports reading PDB files.
+- DSSP supports reading both PDB and mmCIF files.
 
 ## Secondary structure classes
 

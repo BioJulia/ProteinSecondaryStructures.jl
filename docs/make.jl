@@ -11,7 +11,6 @@ makedocs(
         "Home" => "index.md",
         "Explanation" => "explanation.md",
         "User guide" => "user_guide.md",
-        "Citations" => "citations.md",
     ]
 )
 deploydocs(
