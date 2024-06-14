@@ -97,3 +97,13 @@ function dssp_run(input_file::AbstractString; adjust_pdb=false)
     adjust_pdb && rm(structure_file)
     return ss_vector
 end
+
+@testitem "DSSP" begin
+    using ProteinSecondaryStructures.Testing: examples
+    # PDB files
+    for i in 1:6
+        @test ss_composition(dssp_run(examples[i].filename; adjust_pdb=true)) == examples[i].ss_composition[:dssp]
+    end
+    # mmCIF file
+    @test ss_composition(dssp_run(examples[7].filename)) == examples[7].ss_composition[:dssp]
+end

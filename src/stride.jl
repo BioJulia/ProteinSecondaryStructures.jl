@@ -83,3 +83,11 @@ function stride_run(input_pdb_file::AbstractString; adjust_pdb=false)
     adjust_pdb && rm(pdb_file)
     return ss_vector
 end
+
+@testitem "STRIDE" begin
+    using ProteinSecondaryStructures.Testing: examples
+    # PDB files
+    for i in 1:6
+        @test ss_composition(stride_run(examples[i].filename; adjust_pdb=true)) == examples[i].ss_composition[:stride]
+    end
+end
