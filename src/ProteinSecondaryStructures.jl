@@ -60,32 +60,6 @@ represented by more than one character in the future.
 SSData(resname::String, chain::String, resnum::Int) =
     SSData(resname, chain, resnum, " ", 0.0, 0.0, 0.0, 0.0, 0.0)
 
-# Check if two residues are the same given the SSData fields
-residues_match(ss1::SSData, ss2::SSData) =
-    ss1.resname == ss2.resname && ss1.chain == ss2.chain && ss1.resnum == ss2.resnum
-
-# Initialize an array of SSData elements, one for each residue in the pdb file
-function init_ssvector(pdbfile::AbstractString; empty_chain_identifier::String)
-    ssvector = SSData[]
-    open(pdbfile, "r") do io
-        for line in eachline(io)
-            if startswith(line, "ATOM")
-                resname = string(strip(line[18:20]))
-                chain = string(line[22])
-                if chain == empty_chain_identifier
-                    chain = " "
-                end
-                resnum = parse(Int, line[23:26])
-                ssdata = SSData(resname, chain, resnum)
-                if findfirst(ss -> residues_match(ss, ssdata), ssvector) === nothing
-                    push!(ssvector, SSData(resname, chain, resnum))
-                end
-            end
-        end
-    end
-    return ssvector
-end
-
 # Add proper header and empty chain identifier to the pdb file,
 # for each secondary structure calculation method
 function adjust_pdb_file(pdbfile; header::AbstractString, empty_chain_identifier::AbstractString)
