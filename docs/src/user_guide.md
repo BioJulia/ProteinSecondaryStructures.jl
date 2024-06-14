@@ -107,7 +107,12 @@ julia> ss_name.(ss)[1:5]
  "310 helix"
  "310 helix"
 
+julia> join(ss_code.(ss)[1:15])
+"CCCGGGGCTTTTEEE"
+
 ```
+
+In the last case, the sequence of secondary structure elements of the first 15 residues is shown.
 
 
 
