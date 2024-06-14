@@ -44,8 +44,7 @@ of the PDB file does not follow the necessary pattern.
 """
 function dssp_run end
 
-function dssp_pdb_header()
-    strip("""
+const dssp_header = strip("""
           HEADER
           TITLE     TITLE
           COMPND    MOL_ID: 1;
@@ -55,35 +54,21 @@ function dssp_pdb_header()
           AUTHOR    ABC
           CRYST1
           """)
-end
 const dssp_init_line = "  #  RESIDUE AA STRUCTURE BP1 BP2  ACC     N-H-->O    O-->H-N    N-H-->O    O-->H-N    TCO  KAPPA ALPHA  PHI   PSI    X-CA   Y-CA   Z-CA"
 
-function dssp_run(pdbfile::AbstractString; adjust_pdb=true)
+function dssp_run(input_pdb_file::AbstractString; adjust_pdb=true)
     # if the header is not in the correct format, dssp will fail
-    pdbfile = if adjust_pdb
-        tmp_file = tempname() * ".pdb"
-        open(tmp_file, "w") do io
-            println(io, dssp_pdb_header())
-            for line in readlines(pdbfile)
-                if startswith(line, "ATOM") 
-                    # DSSP does not support empty chain identifiers
-                    if line[22] == ' '
-                        line = line[1:21]*'X'*line[23:end]
-                    end
-                    println(io, line)
-                end
-            end
-        end
-        tmp_file
+    pdb_file = if adjust_pdb
+        adjust_pdb_file(input_pdb_file; header=dssp_header, empty_chain_identifier="X")
     else
-        pdbfile
+        input_pdb_file
     end
-    ssvector = init_ssvector(pdbfile; empty_chain_identifier="X")
+    ssvector = init_ssvector(pdb_file; empty_chain_identifier="X")
     # Run dssp on the pdb file
     dssp_raw_data = try
-        readchomp(pipeline(`$dssp_executable --output-format dssp $pdbfile`))
+        readchomp(pipeline(`$dssp_executable --output-format dssp $pdb_file`))
     catch
-        "error executing dssp on $pdbfile"
+        "error executing dssp on $pdb_file"
     end
     isnothing(dssp_raw_data) && return ssvector
     data_begin = false
@@ -94,11 +79,15 @@ function dssp_run(pdbfile::AbstractString; adjust_pdb=true)
         end
         !data_begin && continue
         line[14] == '!' && continue
+        chain = line[12]
+        if chain == 'X'
+            chain = ' '
+        end
         ss_residue = SSData(
             resname=three_letter_code[line[14]],
-            chain=line[12:12],
+            chain=string(chain),
             resnum=parse(Int, line[6:10]),
-            sscode=line[17:17],
+            sscode=string(line[17]),
             phi=parse(Float64, line[104:109]),
             psi=parse(Float64, line[110:115]),
             kappa=parse(Float64, line[92:97]),
@@ -109,5 +98,6 @@ function dssp_run(pdbfile::AbstractString; adjust_pdb=true)
             ssvector[iss] = ss_residue
         end
     end
+    adjust_pdb && rm(pdb_file)
     return ssvector
 end

@@ -21,40 +21,25 @@ of the PDB file does not follow the necessary pattern.
 """
 function stride_run end
 
-function stride_pdb_header()
-    strip(
+const stride_header = strip(
         """  
         HEADER    ABC  PROTEIN                               01-JAN-00   1ABC
         CRYST1
         """)
-end
 
-function stride_run(pdbfile::AbstractString; adjust_pdb=true)
+function stride_run(input_pdb_file::AbstractString; adjust_pdb=true)
     # If the header is not in the correct format, stride will fail
-    pdbfile = if adjust_pdb
-        tmp_file = tempname() * ".pdb"
-        open(tmp_file, "w") do io
-            println(io, stride_pdb_header())
-            for line in readlines(pdbfile)
-                if startswith(line, "ATOM")
-                    # STRIDE uses '-' as the empty chain identifier
-                    if line[22] == ' '
-                        line = line[1:21]*'-'*line[23:end]
-                    end
-                    println(io, line)
-                end
-            end
-        end
-        tmp_file
+    pdb_file = if adjust_pdb
+        adjust_pdb_file(input_pdb_file; header=stride_header, empty_chain_identifier="-")
     else
-        pdbfile
+        input_pdb_file
     end
-    ssvector = init_ssvector(pdbfile; empty_chain_identifier="-")
+    ssvector = init_ssvector(pdb_file; empty_chain_identifier="-")
     # Run stride on the pdb file
     stride_raw_data = try
-        readchomp(pipeline(`$stride_executable $pdbfile`))
+        readchomp(pipeline(`$stride_executable $pdb_file`))
     catch
-        "error running stride on $pdbfile"
+        "error running stride on $pdb_file"
     end
     #      ASG    Detailed secondary structure assignment
     #      Format:  6-8  Residue name
@@ -68,11 +53,15 @@ function stride_run(pdbfile::AbstractString; adjust_pdb=true)
     #	      65-69 Residue solvent accessible area
     for line in eachline(IOBuffer(stride_raw_data))
         if startswith(line, "ASG")
+            chain = line[10]
+            if chain == '-'
+                chain = ' '
+            end
             ss_residue = SSData(
                 resname=line[6:8],
-                chain=line[10:10],
+                chain=string(chain),
                 resnum=parse(Int, line[12:15]),
-                sscode=uppercase(line[25:25]), # stride sometimes returns "b" instead of "B"
+                sscode=string(uppercase(line[25])), # stride sometimes returns "b" instead of "B"
                 phi=parse(Float64, line[43:49]),
                 psi=parse(Float64, line[53:59]),
                 area=parse(Float64, line[65:69])
@@ -83,5 +72,6 @@ function stride_run(pdbfile::AbstractString; adjust_pdb=true)
             end
         end
     end
+    adjust_pdb && rm(pdb_file)
     return ssvector
 end

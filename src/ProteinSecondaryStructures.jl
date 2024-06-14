@@ -71,9 +71,9 @@ function init_ssvector(pdbfile::AbstractString; empty_chain_identifier::String)
         for line in eachline(io)
             if startswith(line, "ATOM")
                 resname = string(strip(line[18:20]))
-                chain = line[22:22]
-                if chain == " "
-                    chain = empty_chain_identifier
+                chain = string(line[22])
+                if chain == empty_chain_identifier
+                    chain = " "
                 end
                 resnum = parse(Int, line[23:26])
                 ssdata = SSData(resname, chain, resnum)
@@ -84,6 +84,25 @@ function init_ssvector(pdbfile::AbstractString; empty_chain_identifier::String)
         end
     end
     return ssvector
+end
+
+# Add proper header and empty chain identifier to the pdb file,
+# for each secondary structure calculation method
+function adjust_pdb_file(pdbfile; header::AbstractString, empty_chain_identifier::AbstractString)
+    tmp_file = tempname() * ".pdb"
+    open(tmp_file, "w") do io
+        println(io, header)
+        for line in readlines(pdbfile)
+            if startswith(line, "ATOM")
+                if line[22] == ' '
+                    line = line[1:21]*empty_chain_identifier*line[23:end]
+                end
+                println(io, line)
+            end
+        end
+        print(io, "END")
+    end
+    return tmp_file
 end
 
 # Stride interface
