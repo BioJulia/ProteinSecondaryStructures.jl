@@ -6,17 +6,24 @@ import STRIDE_jll
 stride_executable = STRIDE_jll.stride_exe()
 
 """
-    stride_run(pdb_file::AbstractString; adjust_pdb=true)
+    stride_run(pdb_file::AbstractString; adjust_pdb=false)
 
 Run stride on the pdb file and return a vector containing the `stride` detailed
 secondary structure information for each residue.
 
-The `adjust_pdb` option is used to fix the header of the pdb file before running `stride`.
+The `adjust_pdb` option is used to adjust the format of the pdb file before running `stride`,
+which requires a specific header and a specific empty-chain identifier. 
 In this case, only the ATOM lines are kept in the pdb file. If `adjust_pdb=false`, the pdb file
 provided is used as is.
 
 Note that `STRIDE` will fail if residue or atoms types not recognized or if the header
 of the PDB file does not follow the necessary pattern.
+
+STRIDE does not support CIF files.
+
+!!! note 
+    STRIDE might ignore some residues in the PDB file if they are not recognized,
+    or incomplete. 
 
 """
 function stride_run end
@@ -27,20 +34,7 @@ const stride_header = strip(
         CRYST1
         """)
 
-function stride_run(input_pdb_file::AbstractString; adjust_pdb=true)
-    # If the header is not in the correct format, stride will fail
-    pdb_file = if adjust_pdb
-        adjust_pdb_file(input_pdb_file; header=stride_header, empty_chain_identifier="-")
-    else
-        input_pdb_file
-    end
-    ssvector = init_ssvector(pdb_file; empty_chain_identifier="-")
-    # Run stride on the pdb file
-    stride_raw_data = try
-        readchomp(pipeline(`$stride_executable $pdb_file`))
-    catch
-        "error running stride on $pdb_file"
-    end
+function parse_stride_output(stride_output::AbstractString)
     #      ASG    Detailed secondary structure assignment
     #      Format:  6-8  Residue name
     #	      10-10 Protein chain identifier
@@ -51,7 +45,8 @@ function stride_run(input_pdb_file::AbstractString; adjust_pdb=true)
     #	      43-49 Phi	angle
     #	      53-59 Psi	angle
     #	      65-69 Residue solvent accessible area
-    for line in eachline(IOBuffer(stride_raw_data))
+    ss_vector = SSData[]
+    for line in eachline(IOBuffer(stride_output))
         if startswith(line, "ASG")
             chain = line[10]
             if chain == '-'
@@ -66,12 +61,25 @@ function stride_run(input_pdb_file::AbstractString; adjust_pdb=true)
                 psi=parse(Float64, line[53:59]),
                 area=parse(Float64, line[65:69])
             )
-            iss = findfirst(ss -> residues_match(ss_residue, ss), ssvector)
-            if !isnothing(iss)
-                ssvector[iss] = ss_residue
-            end
+            push!(ss_vector, ss_residue)
         end
     end
+    return ss_vector
+end
+
+function stride_run(input_pdb_file::AbstractString; adjust_pdb=false)
+    # If the header is not in the correct format, stride will fail
+    pdb_file = if adjust_pdb
+        adjust_pdb_file(input_pdb_file; header=stride_header, empty_chain_identifier="-")
+    else
+        input_pdb_file
+    end
+    stride_output = try
+        readchomp(pipeline(`$stride_executable $pdb_file`))
+    catch
+        "error running stride on $pdb_file"
+    end
+    ss_vector = parse_stride_output(stride_output)
     adjust_pdb && rm(pdb_file)
-    return ssvector
+    return ss_vector
 end
