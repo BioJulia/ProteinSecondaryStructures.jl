@@ -7,7 +7,7 @@ using TestItems: @testitem
     Aqua.test_all(ProteinSecondaryStructures)
 end
 
-@testitem "from pdb file" begin
+@testitem "secondary structure" begin
     using ProteinSecondaryStructures.Testing: examples
     for i in 1:6
         @test ss_composition(stride_run(examples[i].filename; adjust_pdb=true)) == examples[i].ss_composition[:stride]
