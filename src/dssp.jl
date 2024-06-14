@@ -32,7 +32,6 @@ const dssp_header = strip("""
           AUTHOR    ABC
           CRYST1
           """)
-const dssp_init_line = "  #  RESIDUE AA STRUCTURE BP1 BP2  ACC     N-H-->O    O-->H-N    N-H-->O    O-->H-N    TCO  KAPPA ALPHA  PHI   PSI    X-CA   Y-CA   Z-CA"
 
 function parse_dssp_output(dssp_output::AbstractString)
     ss_vector = SSData[]
