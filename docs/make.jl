@@ -10,9 +10,7 @@ makedocs(
     pages = [
         "Home" => "index.md",
         "Explanation" => "explanation.md",
-        "Single PDB files" => "single_pdb.md",
-        "MD Trajectories" => "trajectories.md",
-        "Reference" => "reference.md",
+        "User guide" => "user_guide.md",
         "Citations" => "citations.md",
     ]
 )

@@ -112,12 +112,12 @@ include("./stride.jl")
 include("./dssp.jl")
 
 # Common interface 
-"""
+#=
     ss_classes
 
 Secondary structure classes dictionary. 
 
-"""
+=#
 const ss_classes = Dict{String,String}(
     "G" => "310 helix",
     "H" => "alpha helix",

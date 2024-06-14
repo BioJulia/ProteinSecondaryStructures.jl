@@ -1,27 +1,16 @@
+```@meta
+CollapsedDocStrings = true
+```
+
 # Explanation
 
 ## Overview
 
-This package uses STRIDE or DSSP to compute secondary structures of proteins from their atomic coordinates.
-
-The functions are divided into two groups: 
-
-- Computing the secondary structure from a single PDB file.
-
-- Computing the secondary structure throughout a Molecular Dynamics Simulation.
-
-Additionally, the subset of the strucuture that will be considered for the calculations can be 
-defined through the interface with the `PDBTools` package.
-
-!!! note
-    By default, only atoms of standard protein residues will be considered from the PDB file. It 
-    is possible to select different subsets of atoms with the `selection` keyword, but then `STRIDE`
-    or `DSSP` may fail with internal errors if the residue or atom types are not recognized. 
-    The `selection` keyword follows the [PDBTools.jl selection syntax](https://m3g.github.io/PDBTools.jl/stable/selections/).
+This package uses STRIDE or DSSP to compute secondary structures of proteins from their PDB files.
 
 ## Secondary structure classes
 
-The output of STRIDE or DSSP follow the convention of secondary strucure codes, which are:
+The outputs of STRIDE or DSSP follow the convention of secondary strucure codes, which are:
 
 | SS name             | `ss code`    |`code number` |
 |---------------------|:------------:|:------------:|
@@ -43,7 +32,7 @@ from trajectory runs.
 
 ## Data structure
 
-The output of the secondary structure calculations is a vector of `SSData` elements, with the following data, for each residue:
+The outputs of the secondary structure calculations are vectors of `SSData` elements, with the following data, for each residue:
 
 * `resname::String` - residue name
 * `chain::String` - chain identifier
@@ -55,14 +44,12 @@ The output of the secondary structure calculations is a vector of `SSData` eleme
 * `kappa::Float64` - virtual bond angle (dssp specific)
 * `alpha::Float64` - virtual torsion angle (dssp specific)
 
-The output of `stride_run` or `dssp_run` is a vector of `SSData` structures, one for each residue. For example: 
+For example: 
 
-```julia-repl
+```jldoctest
 julia> using ProteinSecondaryStructures
 
-# Replace the next assignment with a custom PDB file name
-julia> pdbfile = ProteinSecondaryStructures.Testing.examples[1].filename
-"/home/user/.julia/dev/ProteinSecondaryStructures/test/data/pdb/pdb1fmc.pdb"
+julia> pdbfile = ProteinSecondaryStructures.Testing.examples[1].filename;
 
 julia> ss = stride_run(pdbfile);
 
@@ -76,5 +63,10 @@ julia> ss_name(ss[1].sscode)
 "coil"
 ```
 
+### Reference structure
+
+```@docs
+SSData
+```
 
 

@@ -37,6 +37,13 @@ the DSSP convention, described in [Secondary structure classes](@ref).
 
 The details of the `SSData` structure that contain the output for each residue are described in the [Data structure](@ref) section.
 
+### Reference functions:
+
+```@docs
+stride_run
+dssp_run
+```
+
 ## Secondary structure composition
 
 Given the `ss` output of the `stride_run` or `dssp_run` functions, an overview of content of the secondary structure can be obtained with the
@@ -63,6 +70,12 @@ julia> comp["alpha helix"]
 ```
 
 The output is a dictionary containing the number of residues that were classified in each class. As shown above, this number can be retrieved individually.
+
+### Reference function
+
+```@docs
+ss_composition
+```
 
 ## Retrieving names, codes, and numeric codes
 
