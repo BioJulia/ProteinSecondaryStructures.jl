@@ -140,9 +140,6 @@ julia> ss_number(ss)
 
 ```
 
-!!! compat
-    This function was added in version 1.5.0
-
 """
 ss_number(code::SSData) = code_to_number[code.sscode]
 ss_number(code::AbstractChar) = code_to_number[string(code)]
@@ -189,9 +186,6 @@ julia> ss_code(ss)
 "H"
 
 ```
-
-!!! compat
-    This function was added in version 1.5.0
 
 """
 ss_code(code::Integer) = number_to_code[code]

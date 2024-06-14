@@ -9,7 +9,7 @@ makedocs(
     warnonly = [:missing_docs],
     pages = [
         "Home" => "index.md",
-        "Explanation" => "explanation.md",
+        "Overview" => "overview.md",
         "User guide" => "user_guide.md",
     ]
 )

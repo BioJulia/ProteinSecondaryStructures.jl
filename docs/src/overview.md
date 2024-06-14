@@ -2,9 +2,7 @@
 CollapsedDocStrings = true
 ```
 
-# Explanation
-
-## Overview
+# Overview
 
 This package uses STRIDE or DSSP to compute secondary structures of proteins from their structure files:
 
@@ -40,7 +38,6 @@ The outputs of the secondary structure calculations are vectors of `SSData` elem
 * `sscode::String` - secondary structure code
 * `phi::Float64` - phi dihedral angle
 * `psi::Float64` - psi dihedral angle
-* `area::Float64` - solvent accessible area (stride specific)
 
 For example: 
 

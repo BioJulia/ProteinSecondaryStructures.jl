@@ -22,15 +22,15 @@ Then, to compute the secondary structure using the `STRIDE` algorithm, use:
 ```julia-repl
 julia> ss = stride_run(pdbfile)
 510-element Vector{SSData}:
- SSData("MET", "A", 1, "C", 360.0, 150.62, 234.4, 0.0, 0.0)
- SSData("PHE", "A", 2, "C", -69.01, 138.78, 162.9, 0.0, 0.0)
+ SSData("MET", "A", 1, "C", 360.0, 150.62)
+ SSData("PHE", "A", 2, "C", -69.01, 138.78)
  ⋮
- SSData("ASN", "B", 255, "C", -130.75, 360.0, 114.8, 0.0, 0.0)
+ SSData("ASN", "B", 255, "C", -130.75, 360.0)
 ```
 
 The output is a vector of `SSData` elements, which contain the residue name, 
-chain, residue number, and secondary structure code. The list of codes follow
-the DSSP convention, described in [Secondary structure classes](@ref).
+chain, residue number, secondary structure code, and phi and psi angles
+of the residue. The list of codes follow the DSSP convention, described in [Secondary structure classes](@ref).
 
 !!! note 
     Alternativelly to the `stride_run` function, the `dssp_run` function can be used, to compute the secondary structures as defined by DSSP.
