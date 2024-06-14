@@ -11,7 +11,7 @@ Load the package with:
 julia> using ProteinSecondaryStructures
 ```
 
-Here, we illustrate the computation of the secondary structure of a PDB file provides
+Here, we illustrate the computation of the secondary structure of a PDB file provided
 as an example:
 ```julia-repl
 julia> pdbfile = ProteinSecondaryStructures.Testing.examples[1].filename
