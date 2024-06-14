@@ -43,7 +43,7 @@ examples = [
         joinpath(data_dir, "pdb", "bad.pdb"),
         Dict(
             :stride => Dict("310 helix" => 0, "bend" => 0, "turn" => 0, "beta bridge" => 0, "kappa helix" => 0, "pi helix" => 0, "beta strand" => 0, "alpha helix" => 0, "loop" => 0, "coil" => 0),
-            :dssp => Dict("310 helix" => 0, "bend" => 0, "turn" => 0, "beta bridge" => 0, "kappa helix" => 0, "pi helix" => 0, "beta strand" => 0, "alpha helix" => 0, "loop" => 1, "coil" => 0),
+            :dssp => Dict("310 helix" => 0, "bend" => 0, "turn" => 0, "beta bridge" => 0, "kappa helix" => 0, "pi helix" => 0, "beta strand" => 0, "alpha helix" => 0, "loop" => 0, "coil" => 0),
         )
     ),
     ExampleData(# 6
@@ -54,9 +54,9 @@ examples = [
         )
     ),
     ExampleData(# 7
-        joinpath(data_dir, "cif", "6kco.cif"),
+        joinpath(data_dir, "cif", "6e55.cif"),
         Dict(
-            :dssp => Dict("310 helix" => 0, "bend" => 1, "turn" => 2, "beta bridge" => 2, "kappa helix" => 3, "pi helix" => 0, "beta strand" => 0, "alpha helix" => 0, "loop" => 6, "coil" => 0),
+            :dssp => Dict("310 helix" => 9, "bend" => 21, "turn" => 69, "beta bridge" => 2, "kappa helix" => 1, "pi helix" => 0, "beta strand" => 162, "alpha helix" => 97, "loop" => 119, "coil" => 0)
         )
     ),
 ]
