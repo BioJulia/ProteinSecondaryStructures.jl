@@ -10,7 +10,7 @@ end
 @testitem "from pdb file" begin
     using ProteinSecondaryStructures.Testing: examples
     for i in eachindex(examples)
-        @test ss_composition(stride_run(examples[i].filename)) == examples[i].ss_composition[:stride]
-        @test ss_composition(dssp_run(examples[i].filename)) == examples[i].ss_composition[:dssp]
+        @test ss_composition(stride_run(examples[i].filename; adjust_pdb=true)) == examples[i].ss_composition[:stride]
+        @test ss_composition(dssp_run(examples[i].filename; adjust_pdb=true)) == examples[i].ss_composition[:dssp]
     end
 end
