@@ -16,7 +16,7 @@ There is no need to independently install STRIDE or DSSP.
 
 - [BioStructures.jl](https://biojulia.dev/BioStructures.jl/stable/documentation/#Assigning-secondary-structure): provides
   secondary structure calculations in the context of a broader functionality of reading and manipulating protein structures.
-- [MolSimToolkit.jl](https://github.com/biojulia/MolSimToolkit.jl): provides secondary structure calculations for
+- [MolSimToolkit.jl](https://github.com/m3g/MolSimToolkit.jl): provides secondary structure calculations for
   molecular dynamics simulations. 
 
 # References
