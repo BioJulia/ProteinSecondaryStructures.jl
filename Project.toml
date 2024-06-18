@@ -1,7 +1,7 @@
 name = "ProteinSecondaryStructures"
 uuid = "c298f58b-271f-48cb-96ac-5442ca7c67d9"
 authors = ["Leandro Martinez <lmartine@unicamp.br> and contributors"]
-version = "2.0.2"
+version = "2.0.3-DEV"
 
 [deps]
 DSSP_jll = "74334e00-59ce-546d-b517-81f3b7e1d491"
