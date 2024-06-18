@@ -1,6 +1,6 @@
 # ProteinSecondaryStructures.jl
 
-[ProteinSecondaryStructures.jl](https://github.com/biojulia/ProteinSecondaryStructures.jl) parses [STRIDE](http://webclu.bio.wzw.tum.de/stride/) and [DSSP](https://github.com/PDB-REDO/dssp) secondary structure prediction outputs, to make them convenient to use from Julia. 
+[ProteinSecondaryStructures.jl](https://github.com/BioJulia/ProteinSecondaryStructures.jl) parses [STRIDE](http://webclu.bio.wzw.tum.de/stride/) and [DSSP](https://github.com/PDB-REDO/dssp) secondary structure prediction outputs, to make them convenient to use from Julia. 
  
 ## Installation
 
@@ -14,7 +14,7 @@ There is no need to independently install STRIDE or DSSP.
 
 # Related packages
 
-- [BioStructures.jl](https://biojulia.dev/BioStructures.jl/stable/documentation/#Assigning-secondary-structure): provides
+- [BioStructures.jl](https://BioJulia.dev/BioStructures.jl/stable/documentation/#Assigning-secondary-structure): provides
   secondary structure calculations in the context of a broader functionality of reading and manipulating protein structures.
 - [MolSimToolkit.jl](https://github.com/m3g/MolSimToolkit.jl): provides secondary structure calculations for
   molecular dynamics simulations. 

@@ -14,7 +14,7 @@ makedocs(
     ]
 )
 deploydocs(
-    repo = "github.com/biojulia/ProteinSecondaryStructures.jl.git",
+    repo = "github.com/BioJulia/ProteinSecondaryStructures.jl.git",
     target = "build",
     branch = "gh-pages",
     devbranch = "main", 

@@ -1,9 +1,9 @@
-[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://biojulia.github.io/ProteinSecondaryStructures.jl/stable)
-[![Tests](https://img.shields.io/badge/build-passing-green)](https://github.com/biojulia/ProteinSecondaryStructures.jl/actions)
+[![Stable](https://img.shields.io/badge/docs-stable-blue.svg)](https://BioJulia.github.io/ProteinSecondaryStructures.jl/stable)
+[![Tests](https://img.shields.io/badge/build-passing-green)](https://github.com/BioJulia/ProteinSecondaryStructures.jl/actions)
 [![Aqua QA](https://raw.githubusercontent.com/JuliaTesting/Aqua.jl/master/badge.svg)](https://github.com/JuliaTesting/Aqua.jl)
 
 <p align=center>
-<img src=https://raw.githubusercontent.com/biojulia/ProteinSecondaryStructures.jl/main/docs/src/assets/logo.svg>
+<img src=https://raw.githubusercontent.com/BioJulia/ProteinSecondaryStructures.jl/main/docs/src/assets/logo.svg>
 </p>
 
 # ProteinSecondaryStructures.jl
@@ -12,7 +12,7 @@ This package parses [STRIDE]( http://webclu.bio.wzw.tum.de/stride/) and [DSSP](h
 
 ## Documentation
 
-Go to: https://biojulia.github.io/ProteinSecondaryStructures.jl
+Go to: https://BioJulia.github.io/ProteinSecondaryStructures.jl
 
 ## Citations
 
