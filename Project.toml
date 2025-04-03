@@ -9,7 +9,7 @@ STRIDE_jll = "850473c1-9ef0-5df9-a957-757f4cde8b8b"
 TestItems = "1c621080-faea-4a02-84b6-bbd5e436b8fe"
 
 [compat]
-Aqua = "0.6"
+Aqua = "0.8"
 DSSP_jll = "= 4.4.0"
 STRIDE_jll = "1"
 TestItems = "0.1, 1"
