@@ -81,14 +81,16 @@ function dssp_run(input_file::AbstractString; adjust_pdb=false)
         input_file
     end
     # Run dssp
-    dssp_output = try
-        readchomp(pipeline(`$dssp_executable --output-format mmcif $structure_file`))
-    catch
-        "error executing dssp on $input_file"
+    try
+        dssp_output = try
+            readchomp(pipeline(`$dssp_executable --output-format mmcif $structure_file`))
+        catch
+            "error executing dssp on $input_file"
+        end
+        return parse_dssp_output(dssp_output)
+    finally
+        adjust_pdb && rm(structure_file)
     end
-    ss_vector = parse_dssp_output(dssp_output)
-    adjust_pdb && rm(structure_file)
-    return ss_vector
 end
 
 @testitem "DSSP" begin

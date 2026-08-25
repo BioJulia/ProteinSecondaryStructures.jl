@@ -69,14 +69,16 @@ function stride_run(input_pdb_file::AbstractString; adjust_pdb=false)
     else
         input_pdb_file
     end
-    stride_output = try
-        readchomp(pipeline(`$stride_executable $pdb_file`))
-    catch
-        "error running stride on $pdb_file"
+    try
+        stride_output = try
+            readchomp(pipeline(`$stride_executable $pdb_file`))
+        catch
+            "error running stride on $pdb_file"
+        end
+        return parse_stride_output(stride_output)
+    finally
+        adjust_pdb && rm(pdb_file)
     end
-    ss_vector = parse_stride_output(stride_output)
-    adjust_pdb && rm(pdb_file)
-    return ss_vector
 end
 
 @testitem "STRIDE" begin
